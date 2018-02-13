@@ -379,6 +379,7 @@ man/scamp.1
 src/Makefile
 src/fits/Makefile
 src/wcs/Makefile
+src/mustache/Makefile
 tests/Makefile
 ])
 AC_OUTPUT

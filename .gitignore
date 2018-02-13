@@ -16,6 +16,7 @@
 /src/Makefile.in
 /src/fits/Makefile.in
 /src/wcs/Makefile.in
+/src/mustache/Makefile.in
 
 # configure generated files
 /Makefile
@@ -35,6 +36,8 @@
 /src/fits/Makefile
 /src/wcs/.deps/
 /src/wcs/Makefile
+/src/mustache/.deps/
+/src/mustache/Makefile
 /stamp-h1
 /man/scamp.1
 
@@ -44,6 +47,7 @@
 /src/f
 /src/fits/libfits.a
 /src/wcs/libwcs_c.a
+/src/mustache/libmustache.a
 /doc/build/
 
 # test output
