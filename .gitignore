@@ -49,6 +49,7 @@
 /src/wcs/libwcs_c.a
 /src/mustache/libmustache.a
 /doc/build/
+tags
 
 # test output
 /tests/Makefile
