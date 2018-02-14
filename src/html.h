@@ -1,4 +1,4 @@
-/* write html repport utilities */
+/* write html report utilities */
 #ifndef _HTML_H_
 #define _HTML_H_
 

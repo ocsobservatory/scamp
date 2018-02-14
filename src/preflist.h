@@ -369,8 +369,9 @@ char *default_prefs[] =
 "VERBOSE_TYPE           NORMAL          # QUIET, NORMAL, LOG or FULL",
 "WRITE_XML              Y               # Write XML file (Y/N)?",
 "XML_NAME               scamp.xml       # Filename for XML output",
-"WRITE_HTML             Y               # Write HTML repport file (Y/N)?",
-"HTML_NAME              scamp_report.html # Filename for HTML output",
+"WRITE_HTML             Y               # Write HTML report file (Y/N)?",
+"*HTML_NAME              ", HTML_TPL, 
+"*                                       # Filename for HTML output",
 "*XSL_URL                " XSL_URL,
 "*                                       # Filename for XSL style-sheet",
 #ifdef USE_THREADS

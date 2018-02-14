@@ -205,6 +205,14 @@ AC_ARG_WITH(plplot-incdir,
 	[Provide an alternative path to the PLPlot include directory])])
 
 
+# Provide a special option for the default HTML template
+with_html_tpl="file://"$(URBI_RESOLVE_DIR([$datadir]))"/$PACKAGE_TARNAME/scamp_report.html.tpl"
+AC_ARG_WITH(html_tpl,
+	[AS_HELP_STRING([--with-html_tpl=<default URL for HTML template>],
+	[Provide an alternative default template of the mustache engine])])
+
+AC_DEFINE_UNQUOTED([HTML_TPL], "$with_html_tpl",[Default URL of the HTML template])
+
 # Provide a special option for the default XSLT URL
 with_xsl_url="file://"$(URBI_RESOLVE_DIR([$datadir]))"/$PACKAGE_TARNAME/$PACKAGE_TARNAME.xsl"
 AC_ARG_WITH(xsl_url,
