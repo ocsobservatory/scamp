@@ -27,8 +27,10 @@
 					<th>Declination</th>
 					<th>Radius</th>
 					<th>Pixel scale</th>
-					<th>&#916; Pixel scale</th>
-					<th>&#916; Position Anglel</th>
+                    {{?prefs_match_flag}}
+					    <th>&#916; Pixel scale</th>
+					    <th>&#916; Position Anglel</th>
+                    {{/prefs_match_flag}}
 					<th>A/S contrast</th>
 					<th>&#916;X</th>
 					<th>&#916;Y</th>
@@ -56,8 +58,10 @@
 					<td>{{right_asc}}</td>
 					<td>{{dec}}</td>
 					<td>{{radius}}</td>
-					<td>{{pix_scale}}</td>
-					<td>{{delta_pix_scale}}</td>
+                    {{?prefs_match_flag}}
+					    <td>{{pix_scale}}</td>
+					    <td>{{delta_pix_scale}}</td>
+                    {{/prefs_match_flag}}
 					<td>{{delta_pos_angle}}</td>
 					<td>{{a_on_s_contrast}}</td>
 					<td>{{delta_x}}</td>

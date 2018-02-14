@@ -61,6 +61,8 @@
 #define		MAXCHAR		512		/* max. number of characters */
 #define		MAXFILE		100000		/* max number of input files */
 
+#include "globals.h"
+
 /*------------ Set defines according to machine's specificities -------------*/
 
 #if 0
