@@ -44,6 +44,7 @@ Html_write(char *filename)
     Dict *sub;
     sub = Mstc_dict_addSectionItem(dict, "table_summary");
     Mstc_dict_setValue(sub, "num", "number");
+    Mstc_dict_setValue(sub, "filename", "myfilename filename");
 
 
     exp = Mstc_expand_init(6000);
