@@ -197,6 +197,8 @@ pkeystruct key[] =
   {"VERBOSE_TYPE", P_KEY, &prefs.verbose_type, 0,0, 0.0,0.0,
    {"QUIET","NORMAL","LOG", "FULL",""}},
   {"WEIGHTFLAGS_MASK", P_INT, &prefs.wflags_mask, 0,0xff, 0.0,0.0},
+  {"WRITE_HTML", P_BOOL, &prefs.html_flag},
+  {"HTML_NAME", P_STRING, prefs.html_name},
   {"WRITE_XML", P_BOOL, &prefs.xml_flag},
   {"XML_NAME", P_STRING, prefs.xml_name},
   {"XSL_URL", P_STRING, prefs.xsl_name},
@@ -367,6 +369,8 @@ char *default_prefs[] =
 "VERBOSE_TYPE           NORMAL          # QUIET, NORMAL, LOG or FULL",
 "WRITE_XML              Y               # Write XML file (Y/N)?",
 "XML_NAME               scamp.xml       # Filename for XML output",
+"WRITE_HTML             Y               # Write HTML repport file (Y/N)?",
+"HTML_NAME              scamp_report.html # Filename for HTML output",
 "*XSL_URL                " XSL_URL,
 "*                                       # Filename for XSL style-sheet",
 #ifdef USE_THREADS

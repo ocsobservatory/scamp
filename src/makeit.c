@@ -65,6 +65,7 @@
 #endif
 #include "wcs/wcs.h"
 #include "xml.h"
+#include "html.h"
 
 time_t		thetime, thetime2;
 
@@ -585,6 +586,7 @@ void	makeit(void)
 #endif
 
     init_xml(fields, nfield, fgroups, ngroup);
+    Html_set_data(fields, nfield, fgroups, ngroup);
 
     /* Processing end date and time */
     thetime2 = time(NULL);
@@ -655,8 +657,10 @@ void	makeit(void)
     /* Write XML */
     if (prefs.xml_flag)
         write_xml(prefs.xml_name);
-
     end_xml();
+
+    if (prefs.html_flag)
+        Html_write(prefs.html_name);
 
     /* Clean-up stuff */
     NFPRINTF(OUTPUT, "Cleaning up...");

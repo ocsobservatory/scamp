@@ -36,6 +36,7 @@
 #include "fits/fitscat.h"
 #include "fitswcs.h"
 #include "samples.h"
+#include "define.h"
 
 /*----------------------------- Internal constants --------------------------*/
 

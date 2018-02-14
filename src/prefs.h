@@ -217,6 +217,8 @@ typedef struct
   int		nthreads;			/* Number of active threads */
 /* Misc */
   enum {QUIET, NORM, LOG, FULL} verbose_type;	/* display type */
+  int		html_flag;			/* Write HTML repport file? */
+  char		html_name[MAXCHAR];	/* HTML repport file name */
   int		xml_flag;			/* Write XML file? */
   char		xml_name[MAXCHAR];		/* XML file name */
   char		xsl_name[MAXCHAR];		/* XSL file name (or URL) */
