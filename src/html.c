@@ -213,11 +213,12 @@ Html_write(char *filename)
     exp = Mstc_expand_init(6000);
     Mstc_expand_run(ressource, dict, exp);
 
-    FILE *out = fopen(filename, "w");
-    if (!out) {
+    FILE *fd = fopen(filename, "w");
+    if (!fd) {
         perror(filename);
     } else {
-        fwrite(exp->out, 1, strlen(exp->out), out);
+        fwrite(exp->out, 1, strlen(exp->out), fd);
+        fclose(fd);
     }
 
     Mstc_ressource_free(store);
