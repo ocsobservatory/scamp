@@ -219,9 +219,9 @@ typedef struct
   enum {QUIET, NORM, LOG, FULL} verbose_type;	/* display type */
   int		html_flag;			/* Write HTML report file? */
   char		html_name[MAXCHAR];	/* HTML report file name */
+  char		html_tpl[MAXCHAR];	/* HTML template file name */
   int		xml_flag;			/* Write XML file? */
   char		xml_name[MAXCHAR];		/* XML file name */
-  char		xsl_name[MAXCHAR];		/* XSL file name (or URL) */
   char		sdate_start[12];		/* SCAMP start date */
   char		stime_start[12];		/* SCAMP start time */
   char		sdate_end[12];			/* SCAMP end date */

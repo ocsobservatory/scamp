@@ -66,7 +66,3 @@
 
 .. |XML| replace:: :abbr:`XML (eXtensible Markup Language)`
 .. _XML: http://en.wikipedia.org/wiki/XML
-
-.. |XSLT| replace:: :abbr:`XSLT (eXtensible Stylesheet Language Transformations)`
-.. _XSLT: http://en.wikipedia.org/wiki/XSLT
-

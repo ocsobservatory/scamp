@@ -143,12 +143,14 @@ about the calibrations:
 * An |XML|_ file providing a processing summary and various statistics in
   |VOTable|_ format is written if the ``WRITE_XML`` switch is set to ``Y`` (the
   default). The ``XML_NAME`` parameter can be used to change the default
-  file name :file:`scamp.xml`. The |XML| file can be displayed with any recent
-  web browser; the |XSLT|_ stylesheet installed together with |SCAMP| will
-  automatically translate it into a dynamic, user-friendly web-page.
-  For more advanced usages (e.g., access from a remote web server),
-  alternative |XSLT| translation URLs may be specified using the ``XSL_URL``
-  configuration parameter.
+  file name :file:`scamp.xml`.
+
+* An HTML file providing a processing summary and various statistics in
+  HTML format is written if the ``WRITE_HTML`` switch is set to ``Y`` (the
+  default). The ``HTML_NAME`` parameter can be used to change the default
+  file name :file:`scamp_report.html`. The repport can be displayed with any 
+  recent web browser; the HTML template installed together with |SCAMP| will 
+  automatically buid a dynamic, user-friendly web-page.
 
 The Configuration file
 ----------------------

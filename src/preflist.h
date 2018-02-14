@@ -199,9 +199,9 @@ pkeystruct key[] =
   {"WEIGHTFLAGS_MASK", P_INT, &prefs.wflags_mask, 0,0xff, 0.0,0.0},
   {"WRITE_HTML", P_BOOL, &prefs.html_flag},
   {"HTML_NAME", P_STRING, prefs.html_name},
+  {"HTML_TPL", P_STRING, prefs.html_tpl},
   {"WRITE_XML", P_BOOL, &prefs.xml_flag},
   {"XML_NAME", P_STRING, prefs.xml_name},
-  {"XSL_URL", P_STRING, prefs.xsl_name},
   {""}
  };
 
@@ -370,10 +370,9 @@ char *default_prefs[] =
 "WRITE_XML              Y               # Write XML file (Y/N)?",
 "XML_NAME               scamp.xml       # Filename for XML output",
 "WRITE_HTML             Y               # Write HTML report file (Y/N)?",
-"*HTML_NAME              ", HTML_TPL, 
-"*                                       # Filename for HTML output",
-"*XSL_URL                " XSL_URL,
-"*                                       # Filename for XSL style-sheet",
+"HTML_NAME              scamp_report.html # Filename for HTML output",
+"*HTML_TPL               " HTML_TPL, 
+"*                                       # template file name for HTML output",
 #ifdef USE_THREADS
 "NTHREADS               0               # Number of simultaneous threads for",
 "                                       # the SMP version of " BANNER,

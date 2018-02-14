@@ -398,7 +398,10 @@ do_load(
     /* read file into memory */
     FILE *fp;
     fp = fopen(filename, "r");
-    assert(fp != NULL);
+    if (!fp) {
+        perror(filename);
+        abort();
+    }
 
     fseek(fp, 0, SEEK_END);
     long fsize = ftell(fp);

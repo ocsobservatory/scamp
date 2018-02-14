@@ -34,12 +34,16 @@ Html_write(char *filename)
     ExpandOutput     *exp;
 
     store     = Mstc_ressource_create();
-    index     = Mstc_ressource_load(store, "html/index.html.mustache");
+    /*index     = Mstc_ressource_load(store, HTML_TPL);*/
+    index     = Mstc_ressource_load(store, "html/scamp_report.html.tpl");
     ressource = Mstc_ressource_get(store, index);
     dict      = Mstc_dict_new();
 
 
     /* TODO populate the dict */
+    Dict *sub;
+    sub = Mstc_dict_addSectionItem(dict, "table_summary");
+    Mstc_dict_setValue(sub, "num", "number");
 
 
     exp = Mstc_expand_init(6000);

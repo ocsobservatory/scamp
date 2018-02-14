@@ -24,8 +24,8 @@ to the |WCS|_ standard. The main features of |SCAMP| are:
 * Proper motion measurements
 * Multi-threaded code that takes advantage of multiple processors.
 * |VOTable|_-compliant |XML|_ output of meta-data.
-* |XSLT|_ filter sheet provided for convenient access to metadata from a
-  regular web browser.
+* HTML report file provided for convenient access to metadata from a regular 
+  web browser.
 
 .. include:: keys.rst
 

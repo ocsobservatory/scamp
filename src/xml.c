@@ -157,8 +157,6 @@ int	write_xml_header(FILE *file)
 {
 
     fprintf(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(file, "<?xml-stylesheet type=\"text/xsl\" href=\"%s\"?>\n",
-            prefs.xsl_name);
     fprintf(file, "<VOTABLE version=\"1.1\"\n"
             " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
             " xmlns=\"http://www.ivoa.net/xml/VOTable/v1.1\"\n"
@@ -1150,7 +1148,6 @@ int	write_xml_meta(FILE *file, char *msgerror)
         /*-- Miscellaneous */
         write_xmlconfigparam(file, "Verbose_Type", "", "meta.code","%s");
         write_xmlconfigparam(file, "Write_XML", "", "meta.code","%s");
-        write_xmlconfigparam(file, "XSL_URL", "", "meta.ref.url","%s");
         write_xmlconfigparam(file, "NThreads", "",
                 "meta.number;meta.software", "%d");
     }
