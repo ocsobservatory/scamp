@@ -217,30 +217,21 @@
 		{{/photometric_instruments}}
 
 
-		{{?config_file}}
 		<h2>Configuration File</h2>
-		<p>Configuration file: 
-			{{?config_file_name}}
-				{{congig_file_name}}
-			{{/config_file_name}}
-			{{^config_file_name}}
-				scamp.conf
-			{{/config_file_name}}
-		</p>
+		<p>Configuration file: <b>{{config_file_name}}</b></p>
 
 		<table>
 			<tr>
 				<th>Config parameter</th>
 				<th>Value</th>
 			</tr>
-			{{#scamp_config}}
+		{{#scamp_config}}
 			<tr>
 				<td>{{key}}</td>
 				<td>{{value}}</td>
 			</tr>
-			{{/scamp_config}}
+		{{/scamp_config}}
 		</table>
-		{{/config_file}}
 
 		{{?command_line}}
 		<h2>Command Line </h2>

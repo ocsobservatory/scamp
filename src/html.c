@@ -5,6 +5,9 @@
 #include "html.h"
 #include "mustache/mustache_api.h"
 #include "prefs.h"
+#include "key.h"
+
+extern pkeystruct key[];
 
 static fieldstruct  **html_fields;
 static fgroupstruct **html_fgroups;
@@ -74,22 +77,19 @@ Html_write(char *filename)
         Mstc_dict_setValue(sub, "air_mass", "%0.2f", field->airmass);
 
         int pos = 0;
-        for (j=0; j<field->naxis; j++) {
-            snprintf(&buff[pos], MAXCHAR, "%.10g", field->meanwcspos[j]);
-            pos += strlen(buff);
-            snprintf(&buff[pos], MAXCHAR, " ");
-            pos ++;
-        }
+        for (j=0; j<field->naxis; j++)
+            pos += snprintf(&buff[pos], MAXCHAR - pos, "%.10g ",
+                                                         field->meanwcspos[j]);
         buff[pos-1] = '\0';
+
         Mstc_dict_setValue(sub, "right_asc", "%s", buff);
     
         pos = 0;
-        for (j=0; j<field->naxis; j++) {
-            pos += snprintf(&buff[pos], MAXCHAR - pos, "%.6g", field->meanwcsscale[j]*deg2arcsec);
-            snprintf(&buff[pos], MAXCHAR - pos, " ");
-            pos ++;
-        }
+        for (j=0; j<field->naxis; j++)
+            pos += snprintf(&buff[pos], MAXCHAR - pos, "%.6g ", 
+                                            field->meanwcsscale[j]*deg2arcsec);
         buff[pos-1] = '\0';
+
         Mstc_dict_setValue(sub, "dec", "%s", buff);
         
         Mstc_dict_setValue(sub, "radius", "%0.6g", field->maxradius*deg2arcmin);
@@ -126,12 +126,10 @@ Html_write(char *filename)
         Mstc_dict_setValue(sub, "nkeywords", "%d", len);
 
         int pos = 0;
-        for (j=0; j<len; j++) {
-            pos += snprintf(&buff[pos], MAXCHAR - pos, "%32.32s", prefs.astrinstrustr[i]+j*80);
-            snprintf(&buff[pos], MAXCHAR - pos, ", ");
-            pos+=2;
-        }
-        buff[pos] = '\0';
+        for (j=0; j<len; j++)
+            pos += snprintf(&buff[pos], MAXCHAR - pos, "%32.32s, ", 
+                                                  prefs.astrinstrustr[i]+j*80);
+        buff[pos - 2] = '\0';
         Mstc_dict_setValue(sub, "keywords", "%s", buff);
     }
 
@@ -157,26 +155,94 @@ Html_write(char *filename)
         Mstc_dict_setValue(sub, "nkeywords", "%d", len);
 
         int pos = 0;
-        for (j=0; j<len; j++) {
-            pos += snprintf(&buff[pos], MAXCHAR - pos, "%32.32s", prefs.photinstrustr[i]+j*80);
-            snprintf(&buff[pos], MAXCHAR - pos, ", ");
-            pos+=2;
-        }
-        buff[pos] = '\0';
+        for (j=0; j<len; j++)
+            pos += snprintf(&buff[pos], MAXCHAR - pos, "%32.32s, ", 
+                                                  prefs.photinstrustr[i]+j*80);
+        buff[pos-2] = '\0';
         Mstc_dict_setValue(sub, "keywords", "%s", buff);
 
     }
     
+
     /* command line */
     int cpos = 0;
-    for (i=0; i<prefs.ncommand_line; i++) {
-        cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%s", prefs.command_line[i]);
-        snprintf(&buff[cpos], MAXCHAR - cpos, " ");
-        cpos++;
-    }
-    buff[cpos] = '\0';
+    for (i=0; i<prefs.ncommand_line; i++)
+        cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%s ", 
+                                                        prefs.command_line[i]);
+    buff[cpos - 1] = '\0';
+
     Mstc_dict_setValue(dict, "command_line", "%s", buff);
 
+    Mstc_dict_setValue(dict, "config_file_name", "llll %s", prefs.prefs_name);
+
+    /* configuration */
+    for (i=0; key[i].name[0]; i++) {
+        sub = Mstc_dict_addSectionItem(dict, "scamp_config");
+        Mstc_dict_setValue(sub, "key", "%s", key[i].name);
+        switch (key[i].type) {
+            case P_FLOAT:
+                Mstc_dict_setValue(sub, "value", "%f", *((float*)key[i].ptr));
+                break;
+            case P_INT:
+                Mstc_dict_setValue(sub, "value", "%i", *((int*)key[i].ptr));
+                break;
+            case P_STRING:
+                Mstc_dict_setValue(sub, "value", "%s", key[i].ptr);
+                break;
+            case P_BOOL:
+                Mstc_dict_setValue(sub, "value", "%c", 
+                                              *((int*)key[i].ptr) ? 'T' : 'F');
+                break;
+            case P_KEY:
+                Mstc_dict_setValue(sub, "value", "%s", 
+                                          key[i].keylist[*((int*)key[i].ptr)]);
+                break;
+            case P_FLOATLIST:
+                cpos = 0;
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%f, ", 
+                                ((double*)key[i].ptr)[j]);
+                buff[cpos-2] = '\0';
+                Mstc_dict_setValue(sub, "value", "%s", buff);
+                break;
+            case P_INTLIST:
+                cpos = 0;
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%i, ", 
+                                ((int*)key[i].ptr)[j]);
+                buff[cpos-2] = '\0';
+                Mstc_dict_setValue(sub, "value", "%s", buff);
+                break;
+            case P_BOOLLIST:
+                cpos = 0;
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%c, ", 
+                                ((int*)key[i].ptr)[j] ? 'T' : 'F');
+                buff[cpos-2] = '\0';
+                Mstc_dict_setValue(sub, "value", "%s", buff);
+                break;
+            case P_STRINGLIST:
+                cpos = 0;
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%s, ", 
+                                ((char**)key[i].ptr)[j]);
+                buff[cpos-2] = '\0';
+                Mstc_dict_setValue(sub, "value", "%s", buff);
+                break;
+            case P_KEYLIST:
+                cpos = 0;
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    cpos += snprintf(&buff[cpos], MAXCHAR - cpos, "%s, ", 
+                                key[i].keylist[((int*)key[i].ptr)[j]]);
+                buff[cpos-2] = '\0';
+                Mstc_dict_setValue(sub, "value", "%s", buff);
+                break;
+
+        }
+        
+    }
+    
+    
     char *output = Mstc_expand(template, dict);
 
     FILE *fd = fopen(filename, "w");
