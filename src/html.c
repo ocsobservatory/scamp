@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "html.h"
-#include "mustache/mustache.h"
+#include "mustache/mustache_api.h"
 #include "prefs.h"
 
 static fieldstruct  **html_fields;
@@ -28,11 +28,9 @@ Html_set_data(
 void
 Html_write(char *filename)
 {
-    RessourceStore   *store;
-    int              index;
-    Ressource        *ressource;
+    TemplateStore   *store;
+    Template        *template;
     Dict             *dict;
-    ExpandOutput     *exp;
     int i, j;
     char buff[MAXCHAR];
 
@@ -49,10 +47,8 @@ Html_write(char *filename)
     deg2arcsec = (lng!=lat) ? (DEG/ARCSEC) : 1.0;
     deg2arcmin = (lng!=lat) ? (DEG/ARCMIN) : 1.0;
 
-    store     = Mstc_ressource_create();
-    /*index     = Mstc_ressource_load(store, HTML_TPL);*/
-    index     = Mstc_ressource_load(store, "html/scamp_report.html.tpl");
-    ressource = Mstc_ressource_get(store, index);
+    store     = Mstc_template_create();
+    template  = Mstc_template_get(store, "html/scamp_report.html.tpl");
     dict      = Mstc_dict_new();
 
     if (prefs.match_flag)
@@ -65,26 +61,17 @@ Html_write(char *filename)
         field = html_fields[i];
         sub = Mstc_dict_addSectionItem(dict, "table_summary");
 
-        snprintf(buff, MAXCHAR, "%d", field->fieldindex+1);
-        Mstc_dict_setValue(sub, "num", buff);
-        Mstc_dict_setValue(sub, "filename", field->rfilename);
-        Mstc_dict_setValue(sub, "id", field->ident);
-        snprintf(buff, MAXCHAR, "%d", field->nset);
-        Mstc_dict_setValue(sub, "next", buff);
-        snprintf(buff, MAXCHAR, "%d", field->nsample);
-        Mstc_dict_setValue(sub, "ndet", buff);
-        snprintf(buff, MAXCHAR, "%d", field->fgroup->no);
-        Mstc_dict_setValue(sub, "g", buff);
-        snprintf(buff, MAXCHAR, "A%d", field->astromlabel+1);
-        Mstc_dict_setValue(sub, "a", buff);
-        snprintf(buff, MAXCHAR, "P%d", field->photomlabel+1);
-        Mstc_dict_setValue(sub, "p", buff);
-        snprintf(buff, MAXCHAR, "%0.9f", field->epoch);
-        Mstc_dict_setValue(sub, "date", buff);
-        snprintf(buff, MAXCHAR, "%0.3f", field->expotime);
-        Mstc_dict_setValue(sub, "exp_time", buff);
-        snprintf(buff, MAXCHAR, "%0.2f", field->airmass);
-        Mstc_dict_setValue(sub, "air_mass", buff);
+        Mstc_dict_setValue(sub, "num", "%d", field->fieldindex+1);
+        Mstc_dict_setValue(sub, "filename", "%s", field->rfilename);
+        Mstc_dict_setValue(sub, "id", "%s", field->ident);
+        Mstc_dict_setValue(sub, "next", "%d", field->nset);
+        Mstc_dict_setValue(sub, "ndet", "%d", field->nsample);
+        Mstc_dict_setValue(sub, "g", "%d", field->fgroup->no);
+        Mstc_dict_setValue(sub, "a", "A%d", field->astromlabel+1);
+        Mstc_dict_setValue(sub, "p", "P%d", field->photomlabel+1);
+        Mstc_dict_setValue(sub, "date", "%0.9f", field->epoch);
+        Mstc_dict_setValue(sub, "exp_time", "%0.3f", field->expotime);
+        Mstc_dict_setValue(sub, "air_mass", "%0.2f", field->airmass);
 
         int pos = 0;
         for (j=0; j<field->naxis; j++) {
@@ -94,7 +81,7 @@ Html_write(char *filename)
             pos ++;
         }
         buff[pos-1] = '\0';
-        Mstc_dict_setValue(sub, "right_asc", buff);
+        Mstc_dict_setValue(sub, "right_asc", "%s", buff);
     
         pos = 0;
         for (j=0; j<field->naxis; j++) {
@@ -103,26 +90,18 @@ Html_write(char *filename)
             pos ++;
         }
         buff[pos-1] = '\0';
-        Mstc_dict_setValue(sub, "dec", buff);
+        Mstc_dict_setValue(sub, "dec", "%s", buff);
         
-        snprintf(buff, MAXCHAR, "%0.6g", field->maxradius*deg2arcmin);
-        Mstc_dict_setValue(sub, "radius", buff);
-        snprintf(buff, MAXCHAR, "%0.6g", field->dmagzero);
-        Mstc_dict_setValue(sub, "pix_scale", buff);
+        Mstc_dict_setValue(sub, "radius", "%0.6g", field->maxradius*deg2arcmin);
+        Mstc_dict_setValue(sub, "pix_scale", "%0.6g", field->dmagzero);
         
         if (prefs.match_flag) {
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_dscale);
-            Mstc_dict_setValue(sub, "delta_pix_scale", buff);
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_dangle);
-            Mstc_dict_setValue(sub, "delta_pos_angle", buff);
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_asig);
-            Mstc_dict_setValue(sub, "a_on_s_contrast", buff);
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_dlng);
-            Mstc_dict_setValue(sub, "delta_x", buff);
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_dlat);
-            Mstc_dict_setValue(sub, "delta_y", buff);
-            snprintf(buff, MAXCHAR, "%0.6g", field->match_sig);
-            Mstc_dict_setValue(sub, "x_on_y_contrast", buff);
+            Mstc_dict_setValue(sub, "delta_pix_scale", "%0.6g", field->match_dscale);
+            Mstc_dict_setValue(sub, "delta_pos_angle", "%0.6g", field->match_dangle);
+            Mstc_dict_setValue(sub, "a_on_s_contrast", "%0.6g", field->match_asig);
+            Mstc_dict_setValue(sub, "delta_x", "%0.6g", field->match_dlng);
+            Mstc_dict_setValue(sub, "delta_y", "%0.6g", field->match_dlat);
+            Mstc_dict_setValue(sub, "x_on_y_contrast", "%0.6g", field->match_sig);
         }
     }
 
@@ -141,17 +120,10 @@ Html_write(char *filename)
 
         sub = Mstc_dict_addSectionItem(dict, "astrometric_instruments");
 
-        snprintf(buff, MAXCHAR, "A%d", i+1);
-        Mstc_dict_setValue(sub, "name", buff);
-
-        snprintf(buff, MAXCHAR, "%d", i+1);
-        Mstc_dict_setValue(sub, "id", buff);
-
-        snprintf(buff, MAXCHAR, "%d", f2);
-        Mstc_dict_setValue(sub, "nfields", buff);
-
-        snprintf(buff, MAXCHAR, "%d", len);
-        Mstc_dict_setValue(sub, "nkeywords", buff);
+        Mstc_dict_setValue(sub, "name", "A%d", i+1);
+        Mstc_dict_setValue(sub, "id", "%d", i+1);
+        Mstc_dict_setValue(sub, "nfields", "%d", f2);
+        Mstc_dict_setValue(sub, "nkeywords", "%d", len);
 
         int pos = 0;
         for (j=0; j<len; j++) {
@@ -160,7 +132,7 @@ Html_write(char *filename)
             pos+=2;
         }
         buff[pos] = '\0';
-        Mstc_dict_setValue(sub, "keywords", buff);
+        Mstc_dict_setValue(sub, "keywords", "%s", buff);
     }
 
 
@@ -178,16 +150,11 @@ Html_write(char *filename)
         }
 
         sub = Mstc_dict_addSectionItem(dict, "photometric_instruments");
-        snprintf(buff, MAXCHAR, "P%d", i+1);
-        Mstc_dict_setValue(sub, "name", buff);
-        snprintf(buff, MAXCHAR, "%d", i+1);
-        Mstc_dict_setValue(sub, "index", buff);
-        snprintf(buff, MAXCHAR, "%d", f2);
-        Mstc_dict_setValue(sub, "nfields", buff);
-        snprintf(buff, MAXCHAR, "%.6g", prefs.magzero_out[i]);
-        Mstc_dict_setValue(sub, "out_ZP", buff);
-        snprintf(buff, MAXCHAR, "%d", len);
-        Mstc_dict_setValue(sub, "nkeywords", buff);
+        Mstc_dict_setValue(sub, "name", "P%d", i+1);
+        Mstc_dict_setValue(sub, "index", "%d", i+1);
+        Mstc_dict_setValue(sub, "nfields", "%d", f2);
+        Mstc_dict_setValue(sub, "out_ZP", "%.6g", prefs.magzero_out[i]);
+        Mstc_dict_setValue(sub, "nkeywords", "%d", len);
 
         int pos = 0;
         for (j=0; j<len; j++) {
@@ -196,7 +163,7 @@ Html_write(char *filename)
             pos+=2;
         }
         buff[pos] = '\0';
-        Mstc_dict_setValue(sub, "keywords", buff);
+        Mstc_dict_setValue(sub, "keywords", "%s", buff);
 
     }
     
@@ -208,20 +175,19 @@ Html_write(char *filename)
         cpos++;
     }
     buff[cpos] = '\0';
-    Mstc_dict_setValue(dict, "command_line", buff);
+    Mstc_dict_setValue(dict, "command_line", "%s", buff);
 
-    exp = Mstc_expand_init(6000);
-    Mstc_expand_run(ressource, dict, exp);
+    char *output = Mstc_expand(template, dict);
 
     FILE *fd = fopen(filename, "w");
     if (!fd) {
         perror(filename);
     } else {
-        fwrite(exp->out, 1, strlen(exp->out), fd);
+        fwrite(output, 1, strlen(output), fd);
         fclose(fd);
     }
 
-    Mstc_ressource_free(store);
+    free(output);
+    Mstc_template_free(store);
     Mstc_dict_free(dict);
-    Mstc_expand_free(exp);
 }

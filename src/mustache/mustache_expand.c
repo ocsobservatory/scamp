@@ -5,8 +5,14 @@
 #include <assert.h>
 #include <string.h>
 
-#include "mustache.h"
+#include "mustache_api.h"
 
+#define EXP_OUT_MAX 5000
+typedef struct ExpandOutput {
+    char *out;
+    unsigned int used;
+    unsigned int max;
+} ExpandOutput;
 
 /* token handlers */
 static void handle_string(
@@ -51,16 +57,16 @@ static char *ascii_table[256] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0}; /* ..255 */
-static inline int 
+static int
 do_escape(
-    char *b, 
-    char *str, 
+    char *b,
+    char *str,
     size_t len)
 {
     char *c;
     int n = len;
 
-    for (; len > 0; len--) {
+    for (;len;len--) {
         if ((c = ascii_table[(unsigned char) *str])) {
             (*b++) = c[0];
             (*b++) = c[1];
@@ -80,42 +86,25 @@ do_escape(
 
 
 /* api */
-void
-Mstc_expand_run(
-    const Ressource *ressource, 
-    const Dict *dict,
-    ExpandOutput* exp)
+char*
+Mstc_expand(
+    const Template *template,
+    const Dict *dict)
 {
-    exp->used = 0; /* reset */
-    handle_root_section(&ressource->root, dict, exp);
-    exp->out[exp->used] = '\0';
+    ExpandOutput exp;
+    exp.out = malloc(EXP_OUT_MAX);
+    exp.max = EXP_OUT_MAX;
+    exp.used = 0;
+    handle_root_section(&template->root, dict, &exp);
+    exp.out[exp.used] = '\0';
+    return exp.out;
 }
-
-
-ExpandOutput*
-Mstc_expand_init(int max) 
-{
-    ExpandOutput *exp = malloc(sizeof(ExpandOutput));
-    exp->out = malloc(max);
-    exp->max = max;
-    exp->used = 0;
-    return exp;
-}
-
-
-void
-Mstc_expand_free(ExpandOutput* exp) 
-{
-    free(exp->out);
-    free(exp);
-}
-
 
 /* handlers */
 static void
 handle_string(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.STRING_TOKEN */
@@ -136,17 +125,18 @@ handle_string(
 
 static void
 handle_key_noescape(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.KEY_TOKEN_NO_ESCAPE */
-
+    size_t len;
     char *value;
+
     if ((value = Mstc_dict_getValue2(dict, (KeyHash*) t->value)) == NULL)
         return;
 
-    size_t len = strlen(value);
+    len = strlen(value);
     if ((exp->max - exp->used) < len + 1) {
         exp->out = realloc(exp->out, exp->max * 3);
         exp->max *= 3;
@@ -160,17 +150,18 @@ handle_key_noescape(
 
 static void
 handle_key(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.KEY_TOKEN */
-
+    size_t len;
     char *value;
+
     if ((value = Mstc_dict_getValue2(dict, (KeyHash*) t->value)) == NULL)
         return;
 
-    size_t len = strlen(value);
+    len = strlen(value);
     if ((exp->max - exp->used) < (len * 5 + 1)) {
         exp->out = realloc(exp->out, exp->max * 3);
         exp->max *= 3;
@@ -184,16 +175,16 @@ handle_key(
 
 static void
 handle_inv_section(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.INV_SECTION_TOKEN */
+    int i;
 
     if (Mstc_dict_getShowSection2(dict, (KeyHash*) t->value) == true)
         return;
 
-    int i;
     for (i=0; i<t->nchilds; i++)
         handlers[(&t->childs[i])->type](&t->childs[i], dict, exp);
 }
@@ -201,8 +192,8 @@ handle_inv_section(
 
 static void
 handle_root_section(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.ROOT_SECTION_TOKEN */
@@ -215,16 +206,16 @@ handle_root_section(
 
 static void
 handle_bool_section(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.BOOL_SECTION_TOKEN */
+    int i;
 
     if (Mstc_dict_getShowSection2(dict, (KeyHash*) t->value) == false)
         return;
 
-    int i;
     for (i=0; i<t->nchilds; i++)
         handlers[(&t->childs[i])->type](&t->childs[i], dict, exp);
 }
@@ -232,8 +223,8 @@ handle_bool_section(
 
 static void
 handle_section(
-    const Token *t, 
-    const Dict *dict, 
+    const Token *t,
+    const Dict *dict,
     ExpandOutput *exp)
 {
     /* handle TokenType.SECTION_TOKEN */

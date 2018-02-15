@@ -9,7 +9,8 @@
 
 		{{?table_summary}}
 		<h2>Summary Table on Input Files</h2>
-			<table>
+			<table class="table table-striped">
+                            <thead>
 				</tr>
 					<th>#</th>
 					<th>Filename</th>
@@ -41,6 +42,7 @@
 					<th>X2ref High S/N</th>
 					<th>Mag &#916;SP</th>
 				</tr>
+                            </thead>
 				{{#table_summary}}
 				<tr>
 					<td>{{num}}</td>

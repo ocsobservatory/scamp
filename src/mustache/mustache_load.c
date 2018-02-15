@@ -5,12 +5,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "mustache.h"
+#include "mustache_api.h"
 
 #define RES_ARENA_BASE_SIZE 16777216 /* around 15 mb */
 #define RES_DICT_INIT_SIZE 50
 #define ROOT_SECTION_TOKEN_INITIAL_SIZE 20
-
 
 /* forward declaration */
 static Token do_load(const char*, Arena*);
@@ -20,58 +19,47 @@ static void set_token_staticstr(Token*, const char*, const int, Arena*);
 static char* get_filename(char*, const int, Arena*);
 static int do_tokenize(Token*, char**, Arena*);
 static void print_token(Token*);
-static void insert_res(Ressource**, const char*, Arena*);
+static Template* insert_res(Template**, const char*, Arena*);
 
 
-RessourceStore*
-Mstc_ressource_create()
+TemplateStore*
+Mstc_template_create()
 {
     Arena *arena = Arena_new(RES_ARENA_BASE_SIZE);
-    RessourceStore *store = Arena_malloc(arena, sizeof(RessourceStore));
+    TemplateStore *store = Arena_malloc(arena, sizeof(TemplateStore));
     store->arena = arena;
     store->res = Arena_calloc(arena,
-            RES_DICT_INIT_SIZE * sizeof(Ressource*));
+            RES_DICT_INIT_SIZE * sizeof(Template*));
     return store;
 }
 
 
-int
-Mstc_ressource_load(
-    RessourceStore *store, 
+Template*
+Mstc_template_load(
+    TemplateStore *store,
     const char *filename)
 {
     int hash = djb2_hash(filename) % RES_DICT_INIT_SIZE;
-    insert_res(&store->res[hash], filename, store->arena);
-    return hash;
+    return insert_res(&store->res[hash], filename, store->arena);
 }
 
-
-int
-Mstc_ressource_getId(
-    RessourceStore *store, 
+Template*
+Mstc_template_get(
+    TemplateStore *store,
     const char *filename)
 {
-    return Mstc_ressource_load(store, filename);
-}
-
-
-Ressource*
-Mstc_ressource_get(
-    RessourceStore *store, 
-    const int id)
-{
-    return store->res[id];
+    return Mstc_template_load(store, filename);
 }
 
 
 void
-Mstc_ressource_free(RessourceStore *store)
+Mstc_template_free(TemplateStore *store)
 {
     Arena_free(store->arena);
 }
 
 
-void Mstc_ressource_printTokenStructure(Ressource *t)
+void Mstc_template_printTokenStructure(Template *t)
 {
     print_token(&t->root);
 }
@@ -85,7 +73,7 @@ const char type_boolsection[] = "bool_section";
 const char type_invsection[]  = "inv_section";
 const char type_string[]      = "string";
 char*
-Mstc_ressource_getTypeFromCode(TokenType t)
+Mstc_template_getTypeFromCode(TokenType t)
 {
     switch(t) {
         case ROOT_SECTION_TOKEN:
@@ -140,8 +128,8 @@ do_trim(char *str)
 
 static void
 insert_token(
-    Token *root, 
-    const Token child, 
+    Token *root,
+    const Token child,
     Arena *arena)
 {
     if (!child.value) return; /* a comment */
@@ -162,9 +150,9 @@ insert_token(
 
 static void
 set_token_keystr(
-    Token *t, 
-    const char *str, 
-    const int len, 
+    Token *t,
+    const char *str,
+    const int len,
     Arena *arena)
 {
     KeyHash *h = Arena_malloc(arena, sizeof(KeyHash));
@@ -178,7 +166,7 @@ set_token_keystr(
 
 
 /* may overlaps */
-static inline void
+static void
 strmove(char *dest, char *src)
 {
     while((*src) != '\0') {
@@ -223,9 +211,9 @@ tinyfy(char *str)
 
 static void
 set_token_staticstr(
-    Token *t, 
-    const char *str, 
-    const int len, 
+    Token *t,
+    const char *str,
+    const int len,
     Arena *arena)
 {
     /* build a temporary array to store mignified string in arena */
@@ -247,8 +235,8 @@ set_token_staticstr(
 
 static char*
 get_filename(
-    char *str, 
-    const int len, 
+    char *str,
+    const int len,
     Arena *arena)
 {
     char *r = Arena_malloc(arena, len + 1);
@@ -262,8 +250,8 @@ static const char token_start[] = "{{";
 static const char token_end[]   = "}}";
 static int
 do_tokenize(
-    Token *t, 
-    char **current, 
+    Token *t,
+    char **current,
     Arena *arena)
 {
     int s;
@@ -378,7 +366,7 @@ print_token(Token *t)
         out = ((KeyHash*) t->value)->str;
     }
     printf("%*sTOKEN %s value: %s (%i)\n", pos, "",
-            Mstc_ressource_getTypeFromCode(t->type), out, j);
+            Mstc_template_getTypeFromCode(t->type), out, j);
     if (t->nchilds > 0) {
         pos += 4;
         for (i=0; i<t->nchilds; i++) {
@@ -392,19 +380,16 @@ print_token(Token *t)
 
 static Token
 do_load(
-    const char *filename, 
+    const char *filename,
     Arena *arena)
 {
     /* read file into memory */
     FILE *fp;
     fp = fopen(filename, "r");
-    if (!fp) {
-        perror(filename);
-        abort();
-    }
+    assert(fp != NULL);
 
     fseek(fp, 0, SEEK_END);
-    long fsize = ftell(fp);
+    unsigned long fsize = ftell(fp);
     rewind(fp);
 
     char *str = malloc(fsize + 1);
@@ -435,23 +420,23 @@ do_load(
 }
 
 
-static void
+static Template*
 insert_res(
-    Ressource **res, 
-    const char *filename, 
+    Template **res,
+    const char *filename,
     Arena *arena)
 {
     if (*res == NULL) {
-        *res = Arena_malloc(arena, sizeof(Ressource));
+        *res = Arena_malloc(arena, sizeof(Template));
         (*res)->filename = Arena_malloc(arena, sizeof(char) * strlen(filename));
         strcpy((*res)->filename, filename);
         (*res)->next = NULL;
         (*res)->root = do_load(filename, arena);
-        return;
+        return (*res);
     } else if (strcmp((*res)->filename, filename) == 0) { /* allready loaded */
-        return;
+        return (*res);
     } else {    /* find next */
-        insert_res(&(*res)->next, filename, arena);
+        return insert_res(&(*res)->next, filename, arena);
     }
 }
 
