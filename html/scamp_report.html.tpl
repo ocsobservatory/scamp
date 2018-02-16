@@ -103,24 +103,25 @@
 				<th>Astrom. &#916;RA ref, &#916; DEC ref</th>
 				<th>Astrom. &#963;ref</th>
 				<th>Astrom. &#961;ref</th>
-				<th>Astrom. &#935;2ref</th>
+				<th>Astrom. &#967;2ref</th>
 				<th>Astrom. Nref</th>
 				<th>Astrom. &#916;RA ref, &#916; DEC ref High S/N</th>
 				<th>Astrom. &#963;ref High S/N</th>
 				<th>Astrom. &#961;ref High S/N</th>
-				<th>Astrom. &#947;ref High S/N</th>
-				<th>Photom. instrument</th>
+				<th>Astrom. &#947;2ref High S/N</th>
+				<th>Astrom. Nref High S/N</th>
+				<th>Photom. instruments</th>
 				<th>Photom. &#963;int</th>
-				<th>Photom. Xint</th>
+				<th>Photom. &#967;2int</th>
 				<th>Photom. Nint</th>
 				<th>Photom. &#963; High S/N</th>
-				<th>Photom. Y2int High S/N</th>
+				<th>Astrom. &#947;2int High S/N</th>
 				<th>Photom. Nint High S/N</th>
 				<th>Photom. &#963;ref</th>
-				<th>Photom. X2ref</th>
+				<th>Photom. &#967;2ref</th>
 				<th>Photom. Nref</th>
 				<th>Photom. &#963;ref High S/N</th>
-				<th>Photom. Y2ref High S/N</th>
+				<th>Photom. &#947;2ref High S/N</th>
 				<th>Photom. Nref High S/N</th>
 			</tr>
 			{{#group_properties}}

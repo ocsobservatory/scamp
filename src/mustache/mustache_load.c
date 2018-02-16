@@ -1,9 +1,9 @@
 /* MIT License Copyright 2018  Sebastien Serre */
 
+#include <libgen.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "mustache_api.h"
 
@@ -16,8 +16,8 @@ static Token do_load(const char*, Arena*);
 static void do_trim(char*);
 static void insert_token(Token*, const Token, Arena*);
 static void set_token_staticstr(Token*, const char*, const int, Arena*);
-static char* get_filename(char*, const int, Arena*);
-static int do_tokenize(Token*, char**, Arena*);
+static char* get_filename(char*, const int, Arena*,char*);
+static int do_tokenize(Token*, char**, Arena*,char* dname);
 static void print_token(Token*);
 static Template* insert_res(Template**, const char*, Arena*);
 
@@ -35,20 +35,30 @@ Mstc_template_create()
 
 
 Template*
-Mstc_template_load(
-    TemplateStore *store,
-    const char *filename)
+Mstc_template_open(const char *filename)
 {
-    int hash = djb2_hash(filename) % RES_DICT_INIT_SIZE;
-    return insert_res(&store->res[hash], filename, store->arena);
+    Arena *arena  = Arena_new(2000);
+    Template *tpl = Arena_malloc(arena, sizeof(Template));
+    tpl->filename = Arena_malloc(arena, strlen(filename) + 1);
+    strcpy(tpl->filename, filename);
+    tpl->next = (Template*) arena; /* !!! */
+    tpl->root = do_load(filename, arena);
+    return tpl;
 }
+
+void
+Mstc_template_close(Template *tpl) {
+    Arena_free((Arena*) tpl->next);
+}
+
 
 Template*
 Mstc_template_get(
     TemplateStore *store,
     const char *filename)
 {
-    return Mstc_template_load(store, filename);
+    int hash = djb2_hash(filename) % RES_DICT_INIT_SIZE;
+    return insert_res(&store->res[hash], filename, store->arena);
 }
 
 
@@ -237,11 +247,18 @@ static char*
 get_filename(
     char *str,
     const int len,
-    Arena *arena)
+    Arena *arena,
+    char *dname)
 {
-    char *r = Arena_malloc(arena, len + 1);
-    strncpy(r, str, len);
-    r[len] = '\0';
+    char *fname = malloc(len + 1);
+    memcpy(fname, str, len);
+    fname[len] = '\0';
+    do_trim(fname);
+
+    char *r = Arena_malloc(arena, strlen(fname) + strlen(dname) + 2);
+    sprintf(r, "%s/%s", dname, fname);
+    free(fname);
+
     return r;
 }
 
@@ -252,7 +269,8 @@ static int
 do_tokenize(
     Token *t,
     char **current,
-    Arena *arena)
+    Arena *arena,
+    char *dname)
 {
     int s;
     if (strlen(*current) == 0) /* end of processing */
@@ -317,7 +335,7 @@ do_tokenize(
                 start++;
                 t->type = SECTION_TOKEN;
                 set_token_keystr(t, start, end - start, arena);
-                while (do_tokenize(&child, current, arena)) {
+                while (do_tokenize(&child, current, arena, dname)) {
                     insert_token(t, child, arena);
                 }
                 return 1;
@@ -325,7 +343,7 @@ do_tokenize(
                 start++;
                 t->type = BOOL_SECTION_TOKEN;
                 set_token_keystr(t, start, end - start, arena);
-                while ((s = do_tokenize(&child, current, arena))) {
+                while ((s = do_tokenize(&child, current, arena, dname))) {
                     insert_token(t, child, arena);
                 }
                 return 1;
@@ -333,13 +351,14 @@ do_tokenize(
                 start++;
                 t->type = INV_SECTION_TOKEN;
                 set_token_keystr(t, start, end - start, arena);
-                while (do_tokenize(&child, current, arena)) {
+                while (do_tokenize(&child, current, arena, dname)) {
                     insert_token(t, child, arena);
                 }
                 return 1;
             case '>':     /* load external file */
                 start++;
-                *t = do_load(get_filename(start, end - start, arena), arena);
+                *t = do_load(get_filename(start, end - start, arena, dname),
+                                                                        arena);
                 return 1;
             default:      /* basic tag */
                 t->type = KEY_TOKEN;
@@ -377,16 +396,24 @@ print_token(Token *t)
     }
 }
 
-
 static Token
 do_load(
     const char *filename,
     Arena *arena)
 {
+    char *dname1 = malloc(strlen(filename) + 1);
+    strcpy(dname1, filename);
+    char *dname2 = dirname(dname1);
+    char *dname = malloc(strlen(dname2) + 1);
+    strcpy(dname, dname2);
+
     /* read file into memory */
     FILE *fp;
-    fp = fopen(filename, "r");
-    assert(fp != NULL);
+    if ((fp = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, "MUSTACHE Can not open template file. ");
+        perror(filename);
+        abort();
+    }
 
     fseek(fp, 0, SEEK_END);
     unsigned long fsize = ftell(fp);
@@ -410,12 +437,14 @@ do_load(
 
     Token child;
     char *current = str;
-    while (do_tokenize(&child, &current, arena)) {
+    while (do_tokenize(&child, &current, arena, dname)) {
         insert_token(&root, child, arena);
     }
 
     /* free everything */
     free(str);
+    free(dname1);
+    free(dname);
     return root;
 }
 
