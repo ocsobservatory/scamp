@@ -29,17 +29,17 @@
 					<th>Radius</th>
 					<th>Pixel scale</th>
                     {{?prefs_match_flag}}
-					    <th>&#916; Pixel scale</th>
-					    <th>&#916; Position Anglel</th>
+					    <th>&#916;Pixel scale</th>
+					    <th>&#916;Position Angle</th>
+					    <th>A/S contrast</th>
+					    <th>&#916;X</th>
+					    <th>&#916;Y</th>
+					    <th>X/Y contrast</th>
                     {{/prefs_match_flag}}
-					<th>A/S contrast</th>
-					<th>&#916;X</th>
-					<th>&#916;Y</th>
-					<th>X/Y contrast</th>
-					<th>X2int</th>
-					<th>X2int High S/N</th>
-					<th>X2ref</th>
-					<th>X2ref High S/N</th>
+				    <th>&#967;2int</th>
+					<th>&#967;2int High S/N</th>
+					<th>&#967;2ref</th>
+					<th>&#967;2ref High S/N</th>
 					<th>Mag &#916;SP</th>
 				</tr>
                             </thead>
@@ -60,15 +60,15 @@
 					<td>{{right_asc}}</td>
 					<td>{{dec}}</td>
 					<td>{{radius}}</td>
+					<td>{{pix_scale}}</td>
                     {{?prefs_match_flag}}
-					    <td>{{pix_scale}}</td>
 					    <td>{{delta_pix_scale}}</td>
+					    <td>{{delta_pos_angle}}</td>
+					    <td>{{a_on_s_contrast}}</td>
+					    <td>{{delta_x}}</td>
+					    <td>{{delta_y}}</td>
+					    <td>{{x_on_y_contrast}}</td>
                     {{/prefs_match_flag}}
-					<td>{{delta_pos_angle}}</td>
-					<td>{{a_on_s_contrast}}</td>
-					<td>{{delta_x}}</td>
-					<td>{{delta_y}}</td>
-					<td>{{x_on_y_contrast}}</td>
 					<td>{{x_2_int}}</td>
 					<td>{{x_2_int_h_s_on_n}}</td>
 					<td>{{x_2_ref}}</td>

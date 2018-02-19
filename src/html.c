@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "html.h"
-#include "mustache/mustache_api.h"
+#include "mustache/mustache.h"
 #include "prefs.h"
 #include "key.h"
 
@@ -78,34 +79,53 @@ Html_write(char *filename)
         Mstc_dict_setFValue(sub, "date", "%0.9f", field->epoch);
         Mstc_dict_setFValue(sub, "exp_time", "%0.3f", field->expotime);
         Mstc_dict_setFValue(sub, "air_mass", "%0.2f", field->airmass);
-
-        int pos = 0;
-        for (j=0; j<field->naxis; j++)
-            pos += snprintf(&buff[pos], MAXCHAR - pos, "%.10g ",
-                                                         field->meanwcspos[j]);
-        buff[pos-1] = '\0';
-
-        Mstc_dict_setValue(sub, "right_asc", buff);
+        Mstc_dict_setFValue(sub, "flags", "%c%c", 
+            field->headflag   == 1 ? 'H' : '-',
+            field->photomflag == 1 ? 'P' : '-');
+        Mstc_dict_setFValue(sub, "right_asc", "%.0f:%.0f:%.2f", 
+            floor(field->meanwcspos[0] / 15),
+            floor(fmod(field->meanwcspos[0]*4,   60)),
+            floor(fmod(field->meanwcspos[0]*240, 60)));
     
-        pos = 0;
-        for (j=0; j<field->naxis; j++)
-            pos += snprintf(&buff[pos], MAXCHAR - pos, "%.6g ", 
-                                            field->meanwcsscale[j]*deg2arcsec);
-        buff[pos-1] = '\0';
-
-        Mstc_dict_setValue(sub, "dec", buff);
+        double dec = field->meanwcspos[1];
+        char sign = '+';
+        if (dec < 0) {
+            sign = '-';
+            dec = 0 - dec;
+        }
+        Mstc_dict_setFValue(sub, "dec", "%c%.0f:%.0f:%.1f", 
+            sign,
+            floor(dec),
+            floor(fmod(dec * 60, 60)),
+            floor(fmod(dec * 3600, 60)));
         
-        Mstc_dict_setFValue(sub, "radius", "%0.6g", field->maxradius*deg2arcmin);
-        Mstc_dict_setFValue(sub, "pix_scale", "%0.6g", field->dmagzero);
+        Mstc_dict_setFValue(sub, "pix_scale", "%.4f''", 
+            (field->meanwcsscale[0]*deg2arcsec + 
+             field->meanwcsscale[1]*deg2arcsec) / 2);
+        Mstc_dict_setFValue(sub, "radius", "%0.6g'", 
+                                                field->maxradius*deg2arcmin);
         
         if (prefs.match_flag) {
-            Mstc_dict_setFValue(sub, "delta_pix_scale", "%0.6g", field->match_dscale);
-            Mstc_dict_setFValue(sub, "delta_pos_angle", "%0.6g", field->match_dangle);
-            Mstc_dict_setFValue(sub, "a_on_s_contrast", "%0.6g", field->match_asig);
-            Mstc_dict_setFValue(sub, "delta_x", "%0.6g", field->match_dlng);
-            Mstc_dict_setFValue(sub, "delta_y", "%0.6g", field->match_dlat);
-            Mstc_dict_setFValue(sub, "x_on_y_contrast", "%0.6g", field->match_sig);
+            /* TODO MUSTACHE should find it in parent context */
+            Mstc_dict_setShowSection(sub, "prefs_match_flag", true);
+            Mstc_dict_setFValue(sub, "delta_pix_scale", "%0.4f",
+                                                        field->match_dscale);
+            Mstc_dict_setFValue(sub, "delta_pos_angle", "%0.6g°", 
+                                                        field->match_dangle);
+            Mstc_dict_setFValue(sub, "a_on_s_contrast", "%0.1f", 
+                                                        field->match_asig);
+            Mstc_dict_setFValue(sub, "delta_x", "%0.6g°",   field->match_dlng);
+            Mstc_dict_setFValue(sub, "delta_y", "%0.6g°",   field->match_dlat);
+            Mstc_dict_setFValue(sub, "x_on_y_contrast", "%0.1f", 
+                                                            field->match_sig);
         }
+        Mstc_dict_setFValue(sub, "x_2_int", "%.2f", (double) field->chi2_int);
+        Mstc_dict_setFValue(sub, "x_2_int_h_s_on_n", "%.2f", (double)
+                                                          field->chi2_int_hsn);
+        Mstc_dict_setFValue(sub, "x_2_ref", "%.2f", (double) field->chi2_ref);
+        Mstc_dict_setFValue(sub, "x_2_ref_h_s_on_n", "%.2f", 
+                                                (double) field->chi2_ref_hsn);
+        Mstc_dict_setFValue(sub, "mag_delta_zp", "%.3f", field->dmagzero);
     }
 
 
