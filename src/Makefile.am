@@ -44,8 +44,9 @@ scamp_SOURCES	= astrefcat.c astrsolve.c astrstats.c catout.c check.c \
 		  merge.h misc.h mosaic.h photsolve.h preflist.h prefs.h \
 		  proper.h pqueue.h quadtree.h samples.h threads.h types.h \
 		  url.h wcscelsys.h xml.h html.h
+scamp_CFLAGS = $(JSON_CFLAGS)
 scamp_LDADD	= $(srcdir)/fits/libfits.a \
 		  $(srcdir)/wcs/libwcs_c.a \
-		  $(srcdir)/mustache/libmustache.a
+		  $(srcdir)/mustache/libmustache.a $(JSON_LIBS)
 DATE=`date +"%Y-%m-%d"`
 

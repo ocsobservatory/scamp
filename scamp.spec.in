@@ -46,6 +46,7 @@ BuildRequires: fftw-devel >= 3.1
 BuildRequires: atlas-devel >= 3.6.0
 BuildRequires: libcurl-devel >= 7.16.0
 BuildRequires: plplot-devel >= 5.9.1
+BuildRequires: json-c >= 0.11
 
 %description
 SCAMP is a program that computes astrometric and photometric solutions from

@@ -36,9 +36,7 @@ Html_set_data(
 void
 Html_write(char *filename)
 {
-    Template        *template;
-    Dict             *dict;
-    int i, j;
+    int i, j, k;
     char buff[MAXCHAR];
 
     int naxis, lng, lat;
@@ -54,8 +52,7 @@ Html_write(char *filename)
     deg2arcsec = (lng!=lat) ? (DEG/ARCSEC) : 1.0;
     deg2arcmin = (lng!=lat) ? (DEG/ARCMIN) : 1.0;
 
-    template  = Mstc_template_open("html/scamp_report.html.tpl");
-    dict      = Mstc_dict_new();
+    Dict *dict = Mstc_dict_new();
 
     if (prefs.match_flag)
         Mstc_dict_setShowSection(dict, "prefs_match_flag", true);
@@ -129,6 +126,50 @@ Html_write(char *filename)
     }
 
 
+    if (html_nfgroups) {
+        naxis   = html_fgroups[0]->naxis;
+        lng     = html_fgroups[0]->lng;
+        lat     = html_fgroups[0]->lat;
+    } else {
+        naxis = lng = lat = 0;
+    }
+
+    deg2arcsec = (lng!=lat) ? (DEG/ARCSEC) : 1.0;
+    deg2arcmin = (lng!=lat) ? (DEG/ARCMIN) : 1.0;
+
+    /* check if PNG plots are being produced */
+#ifdef HAVE_PLPLOT
+    char plotfilename[MAXCHAR];
+    char *pstr;
+    int nplot , pnplot, pngflag, pngindex;
+    int *cp;
+    QCALLOC(cp, int, prefs.ncplot_type);
+    nplot = pnplot = pngflag = 0;
+    for (i=0; i<prefs.ncplot_device; i++) {
+        if (prefs.cplot_device[i] == CPLOT_PNG) {
+            pngflag = 1;
+            break;
+        }
+    }
+
+    if (pngflag && (pngindex=cplot_check(CPLOT_ALLSKY)) != RETURN_ERROR) {
+        /*
+        strcpy(plotfilename, prefs.cplot_name[pngindex]);
+        if (!(pstr = strrchr(plotfilename, '.')))
+            pstr = plotfilename + strlen(plotfilename);
+        sprintf(pstr, "_1.png");
+        fprintf(file, "   <PARAM name=\"AllSkyPlot\" datatype=\"char\""
+                " ucd=\"meta.id;meta.dataset\" value=\"%s\"/>\n",
+                plotfilename);
+        */
+        cp[nplot++] = pngindex;
+    }
+
+    if (pngflag)
+        Mstc_dict_setShowSection(dict, "have_plots", true);
+#endif /* HAVE_PLPLOT */
+
+
     /* group properties */
     for (i=0; i<html_nfgroups; i++) {
         fgroupstruct *fgroup = html_fgroups[i];
@@ -184,7 +225,6 @@ Html_write(char *filename)
         int f2  = 0;
 
         for (j=0; j<html_nfgroups; j++) {
-            int k;
             for (k=0; k<html_fgroups[j]->nfield;k++) {
                 if (html_fgroups[j]->field[k]->astromlabel == i)
                     f2++;
@@ -213,7 +253,6 @@ Html_write(char *filename)
         int f2 = 0;
 
         for (j=0; j < html_nfgroups; j++) {
-            int k;
             for (k=0; k < html_fgroups[j]->nfield; k++) {
                 if (html_fgroups[j]->field[k]->photomlabel == i)
                     f2++;
@@ -316,6 +355,7 @@ Html_write(char *filename)
     }
     
     
+    Template *template  = Mstc_template_open("html/scamp_report.html.tpl");
     char *output = Mstc_expand(template, dict);
 
     FILE *fd = fopen(filename, "w");
