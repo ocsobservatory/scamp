@@ -36,21 +36,23 @@ Json_set_data(
 Json_write(char *filename)
 {
     json_object *main_obj = json_object_new_object();
-    json_object *field_array = json_object_new_array();
 
+
+    json_object *field_array = json_object_new_array();
     int i;
     for (i=0; i<json_nfields; i++) {
         fieldstruct *field = json_fields[i];
         json_object *field_obj = json_object_new_object();
-        json_object *o;
+        json_object *field_params = json_object_new_array();
 
+        json_object *o;
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Catalog_Number"));
         json_object_object_add(o, "datatype", json_object_new_string("int"));
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.record;meta.table;meta.file"));
         json_object_object_add(o, "value", json_object_new_int(field->fieldindex + 1));
-        json_object_object_add(field_obj, "Catalog_Number", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Catalog_Name"));
@@ -58,7 +60,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id;meta.table;meta.file"));
         json_object_object_add(o, "value", json_object_new_string(field->rfilename));
-        json_object_object_add(field_obj, "Catalog_Name", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Image_Ident"));
@@ -66,7 +68,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id;obs.field"));
         json_object_object_add(o, "value", json_object_new_string(field->ident));
-        json_object_object_add(field_obj, "Image_Ident", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("NExtensions"));
@@ -74,7 +76,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.record"));
         json_object_object_add(o, "value", json_object_new_int(field->nset));
-        json_object_object_add(field_obj, "NExtensions", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("NAxis"));
@@ -82,7 +84,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("pos.wcs.naxis"));
         json_object_object_add(o, "value", json_object_new_int(field->nset));
-        json_object_object_add(field_obj, "NAxis", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Lng_Axis"));
@@ -90,7 +92,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id;pos.eq.ra"));
         json_object_object_add(o, "value", json_object_new_int(field->nset));
-        json_object_object_add(field_obj, "Lng_Axis", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Lat_Axis"));
@@ -98,7 +100,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id;pos.eq.dec"));
         json_object_object_add(o, "value", json_object_new_int(field->nset));
-        json_object_object_add(field_obj, "Lat_Axis", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Ext_Header"));
@@ -106,7 +108,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.code"));
         json_object_object_add(o, "value", json_object_new_boolean(0));
-        json_object_object_add(field_obj, "Ext_Header", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("NDetect"));
@@ -114,7 +116,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
         json_object_object_add(o, "value", json_object_new_int(0));
-        json_object_object_add(field_obj, "NDetect", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Group"));
@@ -122,7 +124,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id.parent;meta.dataset"));
         json_object_object_add(o, "value", json_object_new_int(0));
-        json_object_object_add(field_obj, "Group", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Astr_Instrum"));
@@ -130,7 +132,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id.parent;meta.dataset"));
         json_object_object_add(o, "value", json_object_new_string("hello"));
-        json_object_object_add(field_obj, "Group", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Astr_Instrum"));
@@ -138,7 +140,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id.parent;meta.dataset"));
         json_object_object_add(o, "value", json_object_new_string("hello"));
-        json_object_object_add(field_obj, "Astr_Instrum", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Phot_Instrum"));
@@ -146,7 +148,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.id.parent;meta.dataset"));
         json_object_object_add(o, "value", json_object_new_string("hello"));
-        json_object_object_add(field_obj, "Phot_Instrum", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Photom_Flag"));
@@ -154,7 +156,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.code;phot"));
         json_object_object_add(o, "value", json_object_new_boolean(0));
-        json_object_object_add(field_obj, "Photom_Flag", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Photom_Link"));
@@ -162,7 +164,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("meta.code;phot"));
         json_object_object_add(o, "value", json_object_new_boolean(0));
-        json_object_object_add(field_obj, "Photom_Link", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Observation_Date"));
@@ -170,7 +172,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("yr"));
         json_object_object_add(o, "ucd",  json_object_new_string("time.epoch;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Observation_Date", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -179,7 +181,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("time.duration;obs.exposure"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Exposure_Time", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -188,7 +190,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("obs.airMass"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AirMass", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -197,7 +199,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.ra;pos.eq.dec;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Field_Coordinates", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -206,7 +208,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("instr.scale;instr.pixel;stat.mean"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Pixel_Scale", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -215,7 +217,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("phys.size.radius"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Max_Radius", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -224,7 +226,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("mag"));
         json_object_object_add(o, "ucd",  json_object_new_string("phot.mag;phot.calib;arith.zp"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "ZeroPoint_Corr", o);
+        json_object_array_add(field_params, o);
 
 
         if (prefs.match_flag) {
@@ -234,7 +236,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("None"));
             json_object_object_add(o, "ucd",  json_object_new_string("instr.scale;instr.pixel;arith.ratio"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "DPixelScale", o);
+            json_object_array_add(field_params, o);
 
 
             o = json_object_new_object();
@@ -243,7 +245,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("deg"));
             json_object_object_add(o, "ucd",  json_object_new_string("pos.posAng;obs.image;arith.diff"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "DPosAngle", o);
+            json_object_array_add(field_params, o);
 
 
             o = json_object_new_object();
@@ -252,7 +254,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("None"));
             json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;arith.ratio"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "AS_Contrast", o);
+            json_object_array_add(field_params, o);
 
 
             o = json_object_new_object();
@@ -261,7 +263,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("deg"));
             json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.ra;arith.diff"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "DX", o);
+            json_object_array_add(field_params, o);
 
             o = json_object_new_object();
             json_object_object_add(o, "name", json_object_new_string("DY"));
@@ -269,7 +271,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("deg"));
             json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.dec;arith.diff"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "DY", o);
+            json_object_array_add(field_params, o);
 
             o = json_object_new_object();
             json_object_object_add(o, "name", json_object_new_string("XY_Contrast"));
@@ -277,7 +279,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("None"));
             json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;arith.ratio"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "XY_Contrast", o);
+            json_object_array_add(field_params, o);
 
             o = json_object_new_object();
             json_object_object_add(o, "name", json_object_new_string("Shear"));
@@ -285,7 +287,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("None"));
             json_object_object_add(o, "ucd",  json_object_new_string("phys.size.axisRatio;obs.image"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "Shear", o);
+            json_object_array_add(field_params, o);
 
             o = json_object_new_object();
             json_object_object_add(o, "name", json_object_new_string("Shear_PosAngle"));
@@ -293,7 +295,7 @@ Json_write(char *filename)
             json_object_object_add(o, "unit", json_object_new_string("deg"));
             json_object_object_add(o, "ucd",  json_object_new_string("pos.posAng;obs.image"));
             json_object_object_add(o, "value", json_object_new_double(0.0));
-            json_object_object_add(field_obj, "Shear_PosAngle", o);
+            json_object_array_add(field_params, o);
         }
 
         o = json_object_new_object();
@@ -302,7 +304,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Chi2_Internal", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("NDeg_Internal"));
@@ -310,7 +312,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.dof"));
         json_object_object_add(o, "value", json_object_new_int(0.0));
-        json_object_object_add(field_obj, "NDeg_Internal", o);
+        json_object_array_add(field_params, o);
 
         o = json_object_new_object();
         json_object_object_add(o, "name", json_object_new_string("Chi2_Internal_HighSN"));
@@ -318,7 +320,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Chi2_Internal_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -327,7 +329,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.dof"));
         json_object_object_add(o, "value", json_object_new_int(0.0));
-        json_object_object_add(field_obj, "NDeg_Internal_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -336,7 +338,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.ra;pos.eq.dec;arith.diff;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromOffset_Reference", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -345,7 +347,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.stdev;pos.eq;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromSigma_Reference", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -354,7 +356,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromCorr_Reference", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -363,7 +365,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Chi2_Reference", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -372,7 +374,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.dof"));
         json_object_object_add(o, "value", json_object_new_int(0.0));
-        json_object_object_add(field_obj, "NDeg_Reference", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -381,7 +383,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.ra;pos.eq.dec;arith.diff;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromOffset_Reference_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -390,7 +392,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("%s"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.stdev;pos.eq;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromSigma_Reference_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -399,7 +401,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "AstromCorr_Reference_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -408,7 +410,7 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
         json_object_object_add(o, "value", json_object_new_double(0.0));
-        json_object_object_add(field_obj, "Chi2_Reference_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
         o = json_object_new_object();
@@ -417,13 +419,418 @@ Json_write(char *filename)
         json_object_object_add(o, "unit", json_object_new_string("None"));
         json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.dof"));
         json_object_object_add(o, "value", json_object_new_int(0.0));
-        json_object_object_add(field_obj, "NDeg_Reference_HighSN", o);
+        json_object_array_add(field_params, o);
 
 
+        json_object_object_add(field_obj, "params", field_params);
         json_object_array_add(field_array, field_obj);
     }
 
     json_object_object_add(main_obj, "fields", field_array);
+    json_object_object_add(main_obj, "nfields", json_object_new_int(json_nfields));
+
+    json_object *fgroup_array = json_object_new_array();
+    for (i=0; i<json_nfgroups; i++) {
+        fgroupstruct *fgroup = json_fgroups[i];
+        json_object *fgroup_obj = json_object_new_object();
+        json_object *fgroup_params = json_object_new_array();
+        json_object *o;
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Name"));
+        json_object_object_add(o, "datatype", json_object_new_string("char"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.id;meta.dataset"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Index"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.record;meta.dataset"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("NFields"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;meta.dataset"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("NAxis"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("pos.wcs.naxis"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Lng_Axis"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.id;pos.eq.ra"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Lat_Axis"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.id;pos.eq.de"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Field_Coordinates"));
+        json_object_object_add(o, "datatype", json_object_new_string("double"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("pos.eq.ra;pos.eq.dec;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Pixel_Scale"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("instr.pixel;obs.field;stat.mean"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("Max_Radius"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("phys.size.radius;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstRef_Catalog"));
+        json_object_object_add(o, "datatype", json_object_new_string("char"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.id;meta.dataset"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstRef_Band"));
+        json_object_object_add(o, "datatype", json_object_new_string("char"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("instr.bandpass"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromSigma_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.stdev;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromCorr_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromChi2_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromNDets_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromSigma_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.stdev;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromCorr_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromChi2_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromNDets_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromOffset_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("arith.diff;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromSigma_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.stdev;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromCorr_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromChi2_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromNDets_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromOffset_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("arith.diff;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromSigma_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.stDev;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromCorr_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.correlation;pos.eq;obs.field"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromChi2_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.fit.chi2"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("AstromNDets_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("NPhotInstru"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;meta.em"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotInstru_Name"));
+        json_object_object_add(o, "datatype", json_object_new_string("char"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.id;instr.bandpass"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotSigma_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.error;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotChi2_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.chi2;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotNDets_Internal"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotSigma_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.error;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotChi2_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.chi2;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotNDets_Internal_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotSigma_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.error;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotChi2_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.chi2;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotNDets_Reference"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotSigma_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.error;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotChi2_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("float"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("stat.chi2;phot.mag"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        o = json_object_new_object();
+        json_object_object_add(o, "name", json_object_new_string("PhotNDets_Reference_HighSN"));
+        json_object_object_add(o, "datatype", json_object_new_string("int"));
+        json_object_object_add(o, "unit", json_object_new_string("None"));
+        json_object_object_add(o, "ucd",  json_object_new_string("meta.number;src"));
+        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_array_add(fgroup_params, o);
+
+
+        json_object_object_add(fgroup_obj, "params", fgroup_params);
+        json_object_array_add(fgroup_array, fgroup_obj);
+
+    }
+
+    json_object_object_add(main_obj, "fgroups", fgroup_array);
+    json_object_object_add(main_obj, "nfgroups", json_object_new_int(json_nfgroups));
+
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
@@ -438,3 +845,4 @@ Json_write(char *filename)
     }
 
 }
+
