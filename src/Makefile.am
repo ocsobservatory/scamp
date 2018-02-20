@@ -37,13 +37,13 @@ scamp_SOURCES	= astrefcat.c astrsolve.c astrstats.c catout.c check.c \
 		  colour.c $(CPLOTSOURCE) crossid.c dgeomap.c fft.c fgroup.c \
 		  field.c fitswcs.c header.c main.c makeit.c match.c merge.c \
 		  misc.c mosaic.c photsolve.c pqueue.c prefs.c proper.c \
-		  quadtree.c samples.c threads.c url.c xml.c html.c \
+		  quadtree.c samples.c threads.c url.c xml.c html.c jsonout.c \
 		  astrefcat.h astrsolve.h astrstats.h cathead.h catout.h \
 		  check.h colour.h cplot.h crossid.h define.h dgeomap.h fft.h \
 		  fgroup.h field.h fitswcs.h globals.h header.h key.h match.h \
 		  merge.h misc.h mosaic.h photsolve.h preflist.h prefs.h \
 		  proper.h pqueue.h quadtree.h samples.h threads.h types.h \
-		  url.h wcscelsys.h xml.h html.h
+		  url.h wcscelsys.h xml.h html.h jsonout.h
 scamp_CFLAGS = $(JSON_CFLAGS)
 scamp_LDADD	= $(srcdir)/fits/libfits.a \
 		  $(srcdir)/wcs/libwcs_c.a \

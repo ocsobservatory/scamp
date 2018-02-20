@@ -586,7 +586,7 @@ void	makeit(void)
 #endif
 
     init_xml(fields, nfield, fgroups, ngroup);
-    Html_set_data(fields, nfield, fgroups, ngroup);
+    Json_set_data(fields, nfield, fgroups, ngroup);
 
     /* Processing end date and time */
     thetime2 = time(NULL);
@@ -660,7 +660,7 @@ void	makeit(void)
     end_xml();
 
     if (prefs.html_flag)
-        Html_write(prefs.html_name);
+        Json_write(prefs.html_name);
 
     /* Clean-up stuff */
     NFPRINTF(OUTPUT, "Cleaning up...");
