@@ -52,7 +52,72 @@ new_json_object(
 Json_write(char *filename)
 {
     json_object *main_obj = json_object_new_object();
-    int i;
+    json_object *o;
+    int i, j;
+
+    char strbuff[MAXCHAR];
+    int  strbuffpos;
+
+    char *psuser, *pshost, *pspath;
+#ifdef HAVE_GETENV
+    if (!(psuser=getenv("USERNAME")))   /* Cygwin,... */                            
+        psuser = getenv("LOGNAME");     /* Linux,... */                             
+    pspath = getenv("PWD");                                                         
+    pshost = getenv("HOSTNAME");  
+#endif /* HAVE_GETENV */
+
+    /* soft meta */
+    json_object *soft = json_object_new_object();
+
+    o = new_json_object("Name", "char", "None", "meta.title;meta.software");
+    json_object_object_add(o, "value", json_object_new_string(BANNER));
+    json_object_object_add(soft, "Name", o);
+    
+    o = new_json_object("Version", "char", "None", "meta.version;meta.software");
+    json_object_object_add(o, "value", json_object_new_string(MYVERSION));
+    json_object_object_add(soft, "Version", o);
+    
+    o = new_json_object("Url", "char", "None", "meta.ref.url;meta.software");
+    json_object_object_add(o, "value", json_object_new_string(WEBSITE));
+    json_object_object_add(soft, "Url", o);
+
+    o = new_json_object("Author", "char", "None", "meta.bib.author;meta.software");
+    json_object_object_add(o, "value", json_object_new_string("Emmanuel Bertin"));
+    json_object_object_add(soft, "Author", o);
+
+    o = new_json_object("Ref", "char", "None", "meta.bib.bibcode;meta.software");
+    json_object_object_add(o, "value", json_object_new_string("2006ASPC..351..112B"));
+    json_object_object_add(soft, "Ref", o);
+
+    o = new_json_object("NThreads", "int", "None", "meta.number;meta.software");
+    json_object_object_add(o, "value", json_object_new_int(prefs.nthreads));
+    json_object_object_add(soft, "NThreads", o);
+
+    o = new_json_object("Date", "char", "None", "time.end;meta.software");
+    json_object_object_add(o, "value", json_object_new_string(prefs.sdate_end));
+    json_object_object_add(soft, "Date", o);
+
+    o = new_json_object("Time", "char", "None", "time.end;meta.software");
+    json_object_object_add(o, "value", json_object_new_string(prefs.stime_end));
+    json_object_object_add(soft, "Time", o);
+
+    o = new_json_object("Duration", "float", "None", "time.duration;meta.software");
+    json_object_object_add(o, "value", json_object_new_double(prefs.time_diff));
+    json_object_object_add(soft, "Duration", o);
+
+    o = new_json_object("User", "char", "None", "meta.curation");
+    json_object_object_add(o, "value", json_object_new_string(psuser));
+    json_object_object_add(soft, "User", o);
+
+    o = new_json_object("Host", "char", "None", "meta.curation");
+    json_object_object_add(o, "value", json_object_new_string(pshost));
+    json_object_object_add(soft, "User", o);
+
+    o = new_json_object("Path", "char", "None", "meta.dataset");
+    json_object_object_add(o, "value", json_object_new_string(pspath));
+    json_object_object_add(soft, "Path", o);
+
+    json_object_object_add(main_obj, "Software", soft);
 
     int naxis, lng, lat;
     if (json_nfields) {
@@ -88,9 +153,9 @@ Json_write(char *filename)
             pstr = plotfilename+strlen(plotfilename);
         sprintf(pstr, "_1.png");
 
-        json_object *p = new_json_object("AllSkyPlot", "char", "None", "meta.id;meta.dataset");
-        json_object_object_add(p, "value", json_object_new_string(plotfilename));
-        json_object_object_add(main_obj, "AllSkyPlot", p);
+        o = new_json_object("AllSkyPlot", "char", "None", "meta.id;meta.dataset");
+        json_object_object_add(o, "value", json_object_new_string(plotfilename));
+        json_object_object_add(main_obj, "AllSkyPlot", o);
 
         cp[nplot++] = pngindex;
     }
@@ -103,7 +168,6 @@ Json_write(char *filename)
         json_object *field_obj = json_object_new_object();
         json_object *field_cols = json_object_new_array();
 
-        json_object *o;
         o = new_json_object("Catalog_Number", "int", "None", "meta.record;meta.table;meta.file");
         json_object_object_add(o, "value", json_object_new_int(field->fieldindex + 1));
         json_object_array_add(field_cols, o);
@@ -121,186 +185,189 @@ Json_write(char *filename)
         json_object_array_add(field_cols, o);
 
         o = new_json_object("NAxis", "int", "None", "pos.wcs.naxis");
-        json_object_object_add(o, "value", json_object_new_int(field->nset));
+        json_object_object_add(o, "value", json_object_new_int(field->naxis));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Lng_Axis", "int", "None", "meta.id;pos.eq.ra");
-        json_object_object_add(o, "value", json_object_new_int(field->nset));
+        json_object_object_add(o, "value", json_object_new_int(field->lng));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Lat_Axis", "int", "None", "meta.id;pos.eq.dec");
-        json_object_object_add(o, "value", json_object_new_int(field->nset));
+        json_object_object_add(o, "value", json_object_new_int(field->lat));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Ext_Header", "boolean", "None", "meta.code");
-        json_object_object_add(o, "value", json_object_new_boolean(0));
+        json_object_object_add(o, "value", json_object_new_boolean(field->headflag));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("NDetect", "int", "None", "meta.number;src");
-        json_object_object_add(o, "value", json_object_new_int(0));
+        json_object_object_add(o, "value", json_object_new_int(field->nsample));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Group", "int", "None", "meta.id.parent;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_int(0));
+        json_object_object_add(o, "value", json_object_new_int(field->fgroup->no));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Astr_Instrum", "char", "None", "meta.id.parent;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_string("hello"));
-        json_object_array_add(field_cols, o);
-
-        o = new_json_object("Astr_Instrum", "char", "None", "meta.id.parent;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_string("hello"));
+        snprintf(strbuff, MAXCHAR, "A%d", field->astromlabel+1);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Phot_Instrum", "char", "None", "meta.id.parent;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_string("hello"));
+        snprintf(strbuff, MAXCHAR, "P%d", field->photomlabel+1);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Photom_Flag", "boolean", "None", "meta.code;phot");
-        json_object_object_add(o, "value", json_object_new_boolean(0));
+        json_object_object_add(o, "value", json_object_new_boolean(field->photomflag));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Photom_Link", "boolean", "None", "meta.code;phot");
-        json_object_object_add(o, "value", json_object_new_boolean(0));
+        json_object_object_add(o, "value", json_object_new_boolean(field->photomflag));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Observation_Date", "double", "yr", "time.epoch;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->epoch));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("Exposure_Time", "float", "None", "time.duration;obs.exposure");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->expotime));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("AirMass", "float", "None", "obs.airMass");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->airmass));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("Field_Coordinates", "double", "%s", "pos.eq.ra;pos.eq.dec;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.10g ", field->meanwcspos[j]);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
-
-
+       
         o = new_json_object("Pixel_Scale", "float", "%s", "instr.scale;instr.pixel;stat.mean");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=1; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", field->meanwcsscale[j] * deg2arcsec);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("Max_Radius", "float", "%s", "phys.size.radius");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->maxradius*deg2arcmin));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("ZeroPoint_Corr", "float", "mag", "phot.mag;phot.calib;arith.zp");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->dmagzero));
         json_object_array_add(field_cols, o);
-
 
         if (prefs.match_flag) {
             o = new_json_object("DPixelScale", "float", "None", "instr.scale;instr.pixel;arith.ratio");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_dscale));
             json_object_array_add(field_cols, o);
-
 
             o = new_json_object("DPosAngle", "float", "deg", "pos.posAng;obs.image;arith.diff");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_dangle));
             json_object_array_add(field_cols, o);
-
 
             o = new_json_object("AS_Contrast", "float", "None", "stat.correlation;arith.ratio");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_asig));
             json_object_array_add(field_cols, o);
 
-
             o = new_json_object("DX", "float", "deg", "pos.eq.ra;arith.diff");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_dlng));
             json_object_array_add(field_cols, o);
 
             o = new_json_object("DY", "float", "deg", "pos.eq.dec;arith.diff");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_dlat));
             json_object_array_add(field_cols, o);
 
             o = new_json_object("XY_Contrast", "float", "None", "stat.correlation;arith.ratio");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_sig));
             json_object_array_add(field_cols, o);
 
             o = new_json_object("Shear", "float", "None", "phys.size.axisRatio;obs.image");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_shear));
             json_object_array_add(field_cols, o);
 
             o = new_json_object("Shear_PosAngle", "float", "deg", "pos.posAng;obs.image");
-            json_object_object_add(o, "value", json_object_new_double(0.0));
+            json_object_object_add(o, "value", json_object_new_double(field->match_sangle));
             json_object_array_add(field_cols, o);
         }
 
         o = new_json_object("Chi2_Internal", "float", "None", "stat.fit.chi2");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->chi2_int));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("NDeg_Internal", "int", "None", "stat.fit.dof");
-        json_object_object_add(o, "value", json_object_new_int(0.0));
+        json_object_object_add(o, "value", json_object_new_int(field->nchi2_int));
         json_object_array_add(field_cols, o);
 
         o = new_json_object("Chi2_Internal_HighSN", "float", "None", "stat.fit.chi2");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->chi2_int_hsn));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("NDeg_Internal_HighSN", "int", "None", "stat.fit.dof");
-        json_object_object_add(o, "value", json_object_new_int(0.0));
+        json_object_object_add(o, "value", json_object_new_int(field->nchi2_int_hsn));
         json_object_array_add(field_cols, o);
-
 
         o = new_json_object("AstromOffset_Reference", "float", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->offset_ref[j] * deg2arcsec);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
-
         o = new_json_object("AstromSigma_Reference", "float", "%s", "stat.stdev;pos.eq;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->sig_referr[j] * deg2arcsec);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("AstromCorr_Reference", "float", "None", "stat.correlation;pos.eq;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->sig_corr_ref));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("Chi2_Reference", "float", "None", "stat.fit.chi2");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->chi2_ref));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("NDeg_Reference", "int", "None", "stat.fit.dof");
-        json_object_object_add(o, "value", json_object_new_int(0.0));
+        json_object_object_add(o, "value", json_object_new_int(field->nchi2_ref));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("AstromOffset_Reference_HighSN", "float", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->offset_ref_hsn[j] * deg2arcsec);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("AstromSigma_Reference_HighSN", "float", "%s", "stat.stdev;pos.eq;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<field->naxis; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->sig_referr_hsn[j] * deg2arcsec);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("AstromCorr_Reference_HighSN", "float", "None", "stat.correlation;pos.eq;obs.field");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double((double)field->sig_corr_ref_hsn));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("Chi2_Reference_HighSN", "float", "None", "stat.fit.chi2");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(field->chi2_ref_hsn));
         json_object_array_add(field_cols, o);
 
 
         o = new_json_object("NDeg_Reference_HighSN", "int", "None", "stat.fit.dof");
-        json_object_object_add(o, "value", json_object_new_int(0.0));
+        json_object_object_add(o, "value", json_object_new_int(field->nchi2_ref_hsn));
         json_object_array_add(field_cols, o);
 
 
@@ -308,8 +375,8 @@ Json_write(char *filename)
         json_object_array_add(field_array, field_obj);
     }
 
-    json_object_object_add(main_obj, "fields", field_array);
-    json_object_object_add(main_obj, "nfields", json_object_new_int(json_nfields));
+    json_object_object_add(main_obj, "Fields", field_array);
+    json_object_object_add(main_obj, "NFields", json_object_new_int(json_nfields));
 
 
     /* fgroups */
@@ -549,8 +616,6 @@ Json_write(char *filename)
     for (i=0; i<prefs.nastrinstrustr; i++) {
         json_object *astr_instru_obj = json_object_new_object();
         json_object *astr_instru_cols = json_object_new_array();
-        json_object *o;
-
 
         o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
         json_object_object_add(o, "value", json_object_new_double(0.0));
@@ -596,8 +661,6 @@ Json_write(char *filename)
     for (i=0; i<prefs.nphotinstrustr; i++) {
         json_object *phot_instru_obj = json_object_new_object();
         json_object *phot_instru_cols = json_object_new_array();
-        json_object *o;
-
 
         o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
         json_object_object_add(o, "value", json_object_new_double(0.0));

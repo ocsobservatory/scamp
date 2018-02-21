@@ -65,6 +65,7 @@
 #endif
 #include "wcs/wcs.h"
 #include "xml.h"
+#include "jsonout.h"
 #include "html.h"
 
 time_t		thetime, thetime2;
