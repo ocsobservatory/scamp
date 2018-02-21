@@ -106,7 +106,7 @@ get_next_astrinst_plot(char**name) {
             return -1;
      }
 }
- 
+
 static char *plplot_fgroup_names[] = {
     "FgroupsPlot",
     "Chi2Plot",
@@ -572,7 +572,7 @@ Json_write(char *filename)
     int plot_index;
     pnplot = i = nplot;
 
-    while ((plot_index = get_next_fgroup_plot(&cp_names[i])) >= 0) { 
+    while ((plot_index = get_next_fgroup_plot(&cp_names[i])) >= 0) {
         cp[nplot++] = plot_index;
         i++;
     }
@@ -836,17 +836,17 @@ Json_write(char *filename)
         if (pngflag) {
             for (j=pnplot; j<nplot; j++) {
                 o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
-                strcpy(plotfilename, prefs.cplot_name[cp[j]]);                      
-                if (!(pstr = strrchr(plotfilename, '.')))                           
-                    pstr = plotfilename + strlen(plotfilename);                       
-                sprintf(pstr, "_%d.png", i+1);                                      
+                strcpy(plotfilename, prefs.cplot_name[cp[j]]);
+                if (!(pstr = strrchr(plotfilename, '.')))
+                    pstr = plotfilename + strlen(plotfilename);
+                sprintf(pstr, "_%d.png", i+1);
 
                 json_object_object_add(o, "value", json_object_new_string(plotfilename));
                 json_object_array_add(fgroup_cols, o);
             }
         }
 #endif /* HAVE_PLPLOT */
-        
+
         json_object_object_add(fgroup_obj, "id", json_object_new_int(i+1));
         json_object_object_add(fgroup_obj, "cols", fgroup_cols);
         json_object_array_add(fgroup_array, fgroup_obj);
@@ -862,7 +862,7 @@ Json_write(char *filename)
     /* astro instru */
 #ifdef HAVE_PLPLOT
     pnplot = i = nplot;
-    while ((plot_index = get_next_astrinst_plot(&cp_names[i])) >= 0) { 
+    while ((plot_index = get_next_astrinst_plot(&cp_names[i])) >= 0) {
         cp[nplot++] = plot_index;
         i++;
     }
@@ -915,10 +915,10 @@ Json_write(char *filename)
         if (pngflag) {
             for (j=pnplot; j<nplot; j++) {
                 o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
-                strcpy(plotfilename, prefs.cplot_name[cp[j]]);                      
-                if (!(pstr = strrchr(plotfilename, '.')))                           
-                    pstr = plotfilename + strlen(plotfilename);                       
-                sprintf(pstr, "_%d.png", i+1);                                      
+                strcpy(plotfilename, prefs.cplot_name[cp[j]]);
+                if (!(pstr = strrchr(plotfilename, '.')))
+                    pstr = plotfilename + strlen(plotfilename);
+                sprintf(pstr, "_%d.png", i+1);
 
                 json_object_object_add(o, "value", json_object_new_string(plotfilename));
                 json_object_array_add(astr_instru_cols, o);
@@ -996,6 +996,51 @@ Json_write(char *filename)
     json_object_object_add(tables, "PhotInstru", o);
 
     /* warnings */
+    
+    json_object *warn_array = json_object_new_array();
+    char *warnstr;
+    for (warnstr = warning_history(), i=0; *warnstr; warnstr = warning_history(), i++) {
+        json_object *warn_obj = json_object_new_object();
+        json_object *warn_cols = json_object_new_array();
+
+        o = new_json_object("Date", "char", "None", "meta;time.end");
+        strncpy(strbuff, &warnstr[0], 10);
+        strbuff[10] = '\0';
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        json_object_array_add(warn_cols, o);
+
+        o = new_json_object("Time", "char", "None", "meta;time.end");
+        strncpy(strbuff, &warnstr[11], 8);
+        strbuff[8] = '\0';
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        json_object_array_add(warn_cols, o);
+
+        o = new_json_object("Time", "char", "None", "meta");
+        strncpy(strbuff, &warnstr[22], MAXCHAR);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        json_object_array_add(warn_cols, o);
+
+        json_object_object_add(warn_obj, "id", json_object_new_int(i+1));
+        json_object_object_add(warn_obj, "cols", warn_cols);
+        json_object_array_add(warn_array, warn_obj);
+        
+    }
+
+    o = json_object_new_object();
+    json_object_object_add(o, "data", warn_array);
+    json_object_object_add(o, "number", json_object_new_int(i));
+    json_object_object_add(tables, "Warnings", o);
+
+
+    /* command line */
+    strbuff[0] = '\0';
+    for (i=0; i<prefs.ncommand_line; i++)
+        snprintf(strbuff, MAXCHAR - strlen(strbuff), "%s ", prefs.command_line[i]);
+    json_object_object_add(main_obj, "CommandLine", json_object_new_string(strbuff));
+
+
+    /* config file */
+    /* TODO */
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
