@@ -18,21 +18,21 @@ static fgroupstruct **json_fgroups;
 static int json_nfields;
 static int json_nfgroups;
 
-    void
+void
 Json_set_data(
-        fieldstruct     **fields,
-        int             nfields,
-        fgroupstruct    **fgroups,
-        int             nfgroups)
+        fieldstruct  **fields,
+        int          nfields,
+        fgroupstruct **fgroups,
+        int          nfgroups)
 {
 
-    json_fields = fields;
-    json_fgroups = fgroups;
-    json_nfields = nfields;
+    json_fields   = fields;
+    json_fgroups  = fgroups;
+    json_nfields  = nfields;
     json_nfgroups = nfgroups;
 }
 
-    static json_object*
+static json_object*
 new_json_object(
         char *name,
         char *type,
@@ -48,7 +48,188 @@ new_json_object(
     return o;
 }
 
-    void
+#ifdef HAVE_PLPLOT
+static char *plplot_astrinst_names[] = {
+    "DistPlot",
+    "RefSysPlot",
+    "PixErr1DimPlot",
+    "SubPixErr1DimPlot",
+    "ShearPlot"
+};
+static cplotenum next_astrinst_plot = CPLOT_DISTORT;
+static int
+get_next_astrinst_plot(char**name) {
+    int index;
+    switch (next_astrinst_plot) {
+        case CPLOT_DISTORT:
+            next_astrinst_plot = CPLOT_REFSYSMAP2D;
+            if ((index=cplot_check(CPLOT_DISTORT)) != RETURN_ERROR) {
+                *name = plplot_astrinst_names[0];
+                return index;
+            } else {
+                return get_next_astrinst_plot(name);
+            }
+        case CPLOT_REFSYSMAP2D:
+            next_astrinst_plot = CPLOT_PIXERROR1D;
+            if ((index=cplot_check(CPLOT_REFSYSMAP2D)) != RETURN_ERROR) {
+                *name = plplot_astrinst_names[1];
+                return index;
+            } else {
+                return get_next_astrinst_plot(name);
+            }
+
+        case CPLOT_PIXERROR1D:
+            next_astrinst_plot = CPLOT_SUBPIXERROR1D;
+            if ((index=cplot_check(CPLOT_PIXERROR1D)) != RETURN_ERROR) {
+                *name = plplot_astrinst_names[2];
+                return index;
+            } else {
+                return get_next_astrinst_plot(name);
+            }
+        case CPLOT_SUBPIXERROR1D:
+            next_astrinst_plot = CPLOT_SHEAR;
+            if ((index=cplot_check(CPLOT_SUBPIXERROR1D)) != RETURN_ERROR) {
+                *name = plplot_astrinst_names[3];
+                return index;
+            } else {
+                return get_next_astrinst_plot(name);
+            }
+        case CPLOT_SHEAR:
+            next_astrinst_plot = CPLOT_NONE;
+            if ((index=cplot_check(CPLOT_SHEAR)) != RETURN_ERROR) {
+                *name = plplot_astrinst_names[4];
+                return index;
+            } else {
+                return get_next_astrinst_plot(name);
+            }
+        default:
+            return -1;
+     }
+}
+ 
+static char *plplot_fgroup_names[] = {
+    "FgroupsPlot",
+    "Chi2Plot",
+    "IntErr1DimPlot",
+    "IntErr2DimPlot",
+    "RefErr1DimPlot",
+    "RefErr2DimPlot",
+    "PhotErrPlot",
+    "PhotErrMagPlot",
+    "PhotZPPlot",
+    "PhotZP3Plot",
+    "ColShiftPlot",
+    "RefPropPlot"
+};
+static cplotenum next_fgroup_plot = CPLOT_FGROUPS;
+static int
+get_next_fgroup_plot(char**name) {
+    int index;
+    switch (next_fgroup_plot) {
+        case CPLOT_FGROUPS:
+            next_fgroup_plot = CPLOT_CHI2;
+            if ((index=cplot_check(CPLOT_FGROUPS)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[0];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_CHI2:
+            next_fgroup_plot = CPLOT_ADERROR1D;
+            if ((index=cplot_check(CPLOT_CHI2)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[1];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+
+        case CPLOT_ADERROR1D:
+            next_fgroup_plot = CPLOT_ADERROR2D;
+            if ((index=cplot_check(CPLOT_ADERROR1D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[2];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_ADERROR2D:
+            next_fgroup_plot = CPLOT_REFERROR1D;
+            if ((index=cplot_check(CPLOT_ADERROR2D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[3];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_REFERROR1D:
+            next_fgroup_plot = CPLOT_REFERROR2D;
+            if ((index=cplot_check(CPLOT_REFERROR1D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[4];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_REFERROR2D:
+            next_fgroup_plot = CPLOT_PHOTERROR;
+            if ((index=cplot_check(CPLOT_REFERROR2D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[5];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_PHOTERROR:
+            next_fgroup_plot = CPLOT_PHOTERRORVSMAG;
+            if ((index=cplot_check(CPLOT_PHOTERROR)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[6];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_PHOTERRORVSMAG:
+            next_fgroup_plot = CPLOT_PHOTZP;
+            if ((index=cplot_check(CPLOT_PHOTERRORVSMAG)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[7];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_PHOTZP:
+            next_fgroup_plot = CPLOT_PHOTZP3D;
+            if ((index=cplot_check(CPLOT_PHOTZP)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[8];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_PHOTZP3D:
+            next_fgroup_plot = CPLOT_ASTRCOLSHIFT1D;
+            if ((index=cplot_check(CPLOT_PHOTZP3D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[9];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_ASTRCOLSHIFT1D:
+            next_fgroup_plot = CPLOT_REFPROP;
+            if ((index=cplot_check(CPLOT_ASTRCOLSHIFT1D)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[10];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        case CPLOT_REFPROP:
+            next_fgroup_plot = CPLOT_NONE;
+            if ((index=cplot_check(CPLOT_REFPROP)) != RETURN_ERROR) {
+                *name = plplot_fgroup_names[11];
+                return index;
+            } else {
+                return get_next_fgroup_plot(name);
+            }
+        default:
+            return -1;
+    }
+}
+#endif /* HAVE_PLPLOT */
+
+void
 Json_write(char *filename)
 {
     json_object *main_obj = json_object_new_object();
@@ -145,10 +326,12 @@ Json_write(char *filename)
 #ifdef HAVE_PLPLOT
     int nplot, pnplot, pngflag, pngindex;
     int *cp;
+    char **cp_names;
     char plotfilename[MAXCHAR];
     char *pstr;
     nplot = pnplot = pngflag = 0;
-    QCALLOC(cp, int, prefs.ncplot_type);
+    QCALLOC(cp,         int,    prefs.ncplot_type);
+    QCALLOC(cp_names,   char*,  prefs.ncplot_type);
     for (i=0; i<prefs.ncplot_device; i++)
         if ((prefs.cplot_device[i] == CPLOT_PNG))
         {
@@ -384,6 +567,17 @@ Json_write(char *filename)
 
 
     /* fgroups */
+
+#ifdef HAVE_PLPLOT
+    i = 0;
+    int plot_index;
+    pnplot = nplot;
+    while ((plot_index = get_next_fgroup_plot(&cp_names[i])) > 0) { 
+        cp[nplot++] = plot_index;
+        i++;
+    }
+#endif /* HAVE_PLPLOT */
+
     if (json_nfgroups) {
         naxis = json_fgroups[0]->naxis;
         lng = json_fgroups[0]->lng;
@@ -641,11 +835,14 @@ Json_write(char *filename)
 #ifdef HAVE_PLPLOT
         if (pngflag) {
             for (j=pnplot; j<nplot; j++) {
+                o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
                 strcpy(plotfilename, prefs.cplot_name[cp[j]]);                      
                 if (!(pstr = strrchr(plotfilename, '.')))                           
-                    pstr = plotfilename +strlen(plotfilename);                       
+                    pstr = plotfilename + strlen(plotfilename);                       
                 sprintf(pstr, "_%d.png", i+1);                                      
-                /* TODO */
+
+                json_object_object_add(o, "value", json_object_new_string(plotfilename));
+                json_object_array_add(fgroup_cols, o);
             }
         }
 #endif /* HAVE_PLPLOT */
@@ -663,6 +860,15 @@ Json_write(char *filename)
 
 
     /* astro instru */
+#ifdef HAVE_PLPLOT
+    i = 0;
+    pnplot = nplot;
+    while ((plot_index = get_next_astrinst_plot(&cp_names[i])) > 0) { 
+        cp[nplot++] = plot_index;
+        i++;
+    }
+#endif /* HAVE_PLPLOT */
+
     json_object *astr_instru_array = json_object_new_array();
     for (i=0; i<prefs.nastrinstrustr; i++) {
         int len = fitsfind(prefs.astrinstrustr[i], "END     ");
@@ -707,7 +913,18 @@ Json_write(char *filename)
         json_object_array_add(astr_instru_cols, o);
 
 #ifdef HAVE_PLPLOT
-    /* TODO */
+        if (pngflag) {
+            for (j=pnplot; j<nplot; j++) {
+                o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
+                strcpy(plotfilename, prefs.cplot_name[cp[j]]);                      
+                if (!(pstr = strrchr(plotfilename, '.')))                           
+                    pstr = plotfilename + strlen(plotfilename);                       
+                sprintf(pstr, "_%d.png", i+1);                                      
+
+                json_object_object_add(o, "value", json_object_new_string(plotfilename));
+                json_object_array_add(astr_instru_cols, o);
+            }
+        }
 #endif /* HAVE_PLPLOT */
 
         json_object_object_add(astr_instru_obj, "id", json_object_new_int(i+1));
@@ -782,8 +999,6 @@ Json_write(char *filename)
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
-    json_object_put(main_obj); /* What the fuck */
-
     FILE *fd = fopen(filename, "w");
     if (!fd) {
         perror(filename);
@@ -791,7 +1006,7 @@ Json_write(char *filename)
         fwrite(output, 1, strlen(output), fd);
         fclose(fd);
     }
+    json_object_put(main_obj); /* What the fuck */
+
 
 }
-
-
