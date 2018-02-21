@@ -638,6 +638,18 @@ Json_write(char *filename)
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(fgroup_cols, o);
 
+#ifdef HAVE_PLPLOT
+        if (pngflag) {
+            for (j=pnplot; j<nplot; j++) {
+                strcpy(plotfilename, prefs.cplot_name[cp[j]]);                      
+                if (!(pstr = strrchr(plotfilename, '.')))                           
+                    pstr = plotfilename +strlen(plotfilename);                       
+                sprintf(pstr, "_%d.png", i+1);                                      
+                /* TODO */
+            }
+        }
+#endif /* HAVE_PLPLOT */
+        
         json_object_object_add(fgroup_obj, "id", json_object_new_int(i+1));
         json_object_object_add(fgroup_obj, "cols", fgroup_cols);
         json_object_array_add(fgroup_array, fgroup_obj);
@@ -649,93 +661,123 @@ Json_write(char *filename)
     json_object_object_add(o, "number", json_object_new_int(json_nfgroups));
     json_object_object_add(tables, "Fgroups", o);
 
+
     /* astro instru */
     json_object *astr_instru_array = json_object_new_array();
     for (i=0; i<prefs.nastrinstrustr; i++) {
+        int len = fitsfind(prefs.astrinstrustr[i], "END     ");
+        int f2 = 0;
+        for (j=0; j<json_nfgroups; j++) {
+            int k;
+            for (k=0; k<json_fgroups[j]->nfield; k++) {
+                if (json_fgroups[j]->field[k]->astromlabel==i)
+                    f2++;
+            }
+        }
+
         json_object *astr_instru_obj = json_object_new_object();
         json_object *astr_instru_cols = json_object_new_array();
 
         o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        snprintf(strbuff, MAXCHAR, "A%d", i+1);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(astr_instru_cols, o);
-
 
         o = new_json_object("Index", "int", "None", "meta.record;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(i+1));
         json_object_array_add(astr_instru_cols, o);
-
 
         o = new_json_object("NFields", "int", "None", "meta.number;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(f2));
         json_object_array_add(astr_instru_cols, o);
-
 
         o = new_json_object("MagZeroPoint_Output", "float", "None", "astr.mag;astr.calib;arith.zp");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(prefs.nastrinstruext[i]));
         json_object_array_add(astr_instru_cols, o);
-
 
         o = new_json_object("NKeys", "int", "None", "meta.number");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(len));
         json_object_array_add(astr_instru_cols, o);
-
 
         o = new_json_object("Keys", "char", "None", "meta.note");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<prefs.nphotinstrustr; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%32.32s ", prefs.astrinstrustr[i] + (j*80));
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(astr_instru_cols, o);
 
-        json_object_object_add(astr_instru_obj, "params", astr_instru_cols);
+#ifdef HAVE_PLPLOT
+    /* TODO */
+#endif /* HAVE_PLPLOT */
+
+        json_object_object_add(astr_instru_obj, "id", json_object_new_int(i+1));
+        json_object_object_add(astr_instru_obj, "cols", astr_instru_cols);
         json_object_array_add(astr_instru_array, astr_instru_obj);
 
     }
 
-    json_object_object_add(main_obj, "astrinstr", astr_instru_array);
-    json_object_object_add(main_obj, "nastrinstr", json_object_new_int(prefs.nastrinstrustr));
+    o = json_object_new_object();
+    json_object_object_add(o, "data", astr_instru_array);
+    json_object_object_add(o, "number", json_object_new_int(prefs.nastrinstrustr));
+    json_object_object_add(tables, "AstroInstru", o);
 
 
 
     /* phot instru */
     json_object *phot_instru_array = json_object_new_array();
     for (i=0; i<prefs.nphotinstrustr; i++) {
+
+        int len = fitsfind(prefs.photinstrustr[i], "END     ");
+        int f2 = 0;
+        for (j=0; j<json_nfgroups; j++) {
+            int k;
+            for (k=0; k<json_fgroups[j]->nfield; k++) {
+                if (json_fgroups[j]->field[k]->photomlabel==i)
+                    f2++;
+            }
+        }
+
         json_object *phot_instru_obj = json_object_new_object();
         json_object *phot_instru_cols = json_object_new_array();
 
         o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        snprintf(strbuff, MAXCHAR, "P%d", i+1);
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(phot_instru_cols, o);
-
 
         o = new_json_object("Index", "int", "None", "meta.record;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(i+1));
         json_object_array_add(phot_instru_cols, o);
-
 
         o = new_json_object("NFields", "int", "None", "meta.number;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(f2));
         json_object_array_add(phot_instru_cols, o);
-
 
         o = new_json_object("MagZeroPoint_Output", "float", "None", "phot.mag;phot.calib;arith.zp");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_double(prefs.magzero_out[i]));
         json_object_array_add(phot_instru_cols, o);
-
 
         o = new_json_object("NKeys", "int", "None", "meta.number");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        json_object_object_add(o, "value", json_object_new_int(len));
         json_object_array_add(phot_instru_cols, o);
-
 
         o = new_json_object("Keys", "char", "None", "meta.note");
-        json_object_object_add(o, "value", json_object_new_double(0.0));
+        strbuffpos = 0;
+        for (j=0; j<prefs.nphotinstrustr; j++)
+            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%32.32s ", prefs.photinstrustr[i] + (j*80));
+        json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(phot_instru_cols, o);
 
-        json_object_object_add(phot_instru_obj, "params", phot_instru_cols);
+        json_object_object_add(phot_instru_obj, "id", json_object_new_int(i+1));
+        json_object_object_add(phot_instru_obj, "cols", phot_instru_cols);
         json_object_array_add(phot_instru_array, phot_instru_obj);
 
     }
 
-    json_object_object_add(main_obj, "photinstr", phot_instru_array);
-    json_object_object_add(main_obj, "nphotinstr", json_object_new_int(prefs.nphotinstrustr));
+    o = json_object_new_object();
+    json_object_object_add(o, "data", phot_instru_array);
+    json_object_object_add(o, "number", json_object_new_int(prefs.nphotinstrustr));
+    json_object_object_add(tables, "PhotInstru", o);
 
 
     char *output = (char*) json_object_to_json_string(main_obj);
