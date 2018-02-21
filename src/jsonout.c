@@ -332,12 +332,12 @@ Json_write(char *filename)
     nplot = pnplot = pngflag = 0;
     QCALLOC(cp,         int,    prefs.ncplot_type);
     QCALLOC(cp_names,   char*,  prefs.ncplot_type);
-    for (i=0; i<prefs.ncplot_device; i++)
-        if ((prefs.cplot_device[i] == CPLOT_PNG))
-        {
+    for (i=0; i<prefs.ncplot_device; i++) {
+        if ((prefs.cplot_device[i] == CPLOT_PNG)) {
             pngflag = 1;
             break;
         }
+    }
 
     /* Check-plots */
     if (pngflag && (pngindex=cplot_check(CPLOT_ALLSKY)) != RETURN_ERROR)
@@ -569,10 +569,10 @@ Json_write(char *filename)
     /* fgroups */
 
 #ifdef HAVE_PLPLOT
-    i = 0;
     int plot_index;
-    pnplot = nplot;
-    while ((plot_index = get_next_fgroup_plot(&cp_names[i])) > 0) { 
+    pnplot = i = nplot;
+
+    while ((plot_index = get_next_fgroup_plot(&cp_names[i])) >= 0) { 
         cp[nplot++] = plot_index;
         i++;
     }
@@ -861,9 +861,8 @@ Json_write(char *filename)
 
     /* astro instru */
 #ifdef HAVE_PLPLOT
-    i = 0;
-    pnplot = nplot;
-    while ((plot_index = get_next_astrinst_plot(&cp_names[i])) > 0) { 
+    pnplot = i = nplot;
+    while ((plot_index = get_next_astrinst_plot(&cp_names[i])) >= 0) { 
         cp[nplot++] = plot_index;
         i++;
     }
@@ -996,6 +995,7 @@ Json_write(char *filename)
     json_object_object_add(o, "number", json_object_new_int(prefs.nphotinstrustr));
     json_object_object_add(tables, "PhotInstru", o);
 
+    /* warnings */
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
