@@ -229,6 +229,261 @@ get_next_fgroup_plot(char**name) {
 }
 #endif /* HAVE_PLPLOT */
 
+struct conf_params {
+    char *name;
+    char *unit;
+    char *ucd;
+    char *format;};
+static const struct conf_params params[] = {
+    {"FGroup_Radius",	"arcmin",	"phot.calib;obs.param",	"%.6g"},
+    {"Ref_Server",	    "",	    "meta.ref.url",	"%s"},
+    {"Ref_TimeOut",	    "s",	"meta;time.duration",	"%.2g"},
+    {"AstRef_Catalog",	"",	    "meta.code;meta.file",	"%s"},
+    {"AstRef_Band",	    "",	    "instr.bandpass",	"%s"},
+    {"AstRefCat_Name",	"",	    "meta.id;meta.file;meta.dataset",	"%s"},
+    {"AstRefCent_Keys",	"",	    "meta.id;pos.eq",	"%s"},
+    {"AstRefErr_Keys",	"",	    "meta.id;pos.errorEllipse",	"%s"},
+    {"AstRefMag_Key",	"",	    "meta.id;phot.mag",	"%s"},
+    {"AstRefMagErr_Key",	"",	"meta.id;phot.mag",	"%s"},
+    {"AstRefObsDate_Key",	"",	"meta.id;time.epoch",	"%s"},
+    {"AstRefMag_Limits",	"mag",	"phot.mag;stat.min;stat.max;obs.param",	"%.6g"},
+    {"Save_RefCatalog",	"",	    "meta.code",	"%c"},
+    {"RefOut_CatPath",	"",	    "meta.id;meta.file",	"%s"},
+    {"MergedOutCat_Name",	"",	"meta.id;meta.file;meta.dataset",	"%s"},
+    {"MergedOutCat_Type",	"",	"meta.code;meta.dataset",	"%s"},
+    {"Save_DGeoMap",	"",	    "meta.code",	"%c"},
+    {"DGeoMap_Name",	"",	    "meta.id;meta.file;meta.dataset",	"%s"},
+    {"DGeoMap_Step",	"pix",	"meta.number",	"%d"},
+    {"DGeoMap_NNearest",	"",	"meta.number",	"%d"},
+    {"FullOutCat_Name",	"",	"meta.id;meta.file;meta.dataset",	"%s"},
+    {"FullOutCat_Type",	"",	"meta.code;meta.dataset",	"%s"},
+    {"Match",	        "",	"meta.code;obs.param",	"%c"},
+    {"Match_NMax",	    "",	"meta.number;src;obs.param",	"%d"},
+    {"PixScale_MaxErr",	"",	"instr.precision;instr.pixel;obs.param",	"%.6g"},
+    {"PosAngle_MaxErr",	"deg",	"instr.precision;pos.posAng;obs.param",	"%.6g"},
+    {"Position_MaxErr",	"arcmin",	"instr.precision;pos.eq;obs.param",	"%.6g"},
+    {"Match_Resol",	    "arcsec",	"stat.param;phys.angSize",	"%.6g"},
+    {"Match_Flipped",	"",	"instr.param;obs.param",	"%c"},
+    {"Mosaic_Type",	    "",	"instr.param;obs.param",	"%s"},
+    {"FixFocalPlane_NMin",	"",	"meta.number;src;obs.param",	"%d"},
+    {"CrossId_Radius",	"arcsec",	"pos.angDistance;stat.max",	"%.6g"},
+    {"Solve_Astrom",	"",	"meta.code;obs.param",	"%c"},
+    {"Projection_Type",	"",	"instr.param;obs.param",	"%s"},
+    {"AstrInstru_Key",	"",	"meta.id;instr.setup;pos",	"%s"},
+    {"Stability_Type",	"",	"instr.param;obs.param",	"%s"},
+    {"Centroid_Keys",	"",	"meta.id;pos.barycenter;src",	"%s"},
+    {"CentroidErr_Keys",	"",	"meta.id;pos.errorEllipse;src",	"%s"},
+    {"Distort_Keys",	"",	"meta.id;stat.fit.param;src",	"%s"},
+    {"Distort_Groups",	"",	"meta.id;stat.fit.param",	"%d"},
+    {"Distort_Degrees",	"",	"meta.id;stat.fit.param",	"%d"},
+    {"FocDistort_Degree",	"",	"meta.id;stat.fit.param",	"%d"},
+    {"Astref_Weight",	"",	"meta.id;stat.fit.param",	"%.6g"},
+    {"AstrAccuracy_Type",	"",	"instr.param;obs.param",	"%s"},
+    {"AstrAccuracy_Key",	"",	"meta.id;stat.fit.param;src",	"%s"},
+    {"Astr_Accuracy",	"",	"meta.id;stat.param;pos",	"%.6g"},
+    {"AstrClip_NSigma",	"",	"meta.id;stat.param;pos",	"%.6g"},
+    {"Compute_Parallaxes",	"",	"meta.code;obs.param",	"%c"},
+    {"Compute_ProperMotions",	"",	"meta.code;obs.param",	"%c"},
+    {"Correct_ColourShifts",	"",	"meta.code;obs.param",	"%c"},
+    {"Include_AstRefCatalog",	"",	"meta.code;obs.param",	"%c"},
+    {"Astr_FlagsMask",	"",	"meta.code.qual",	"%d"},
+    {"Astr_ImaFlagsMask",	"",	"meta.code.qual",	"%d"},
+    {"Solve_Photom",	"",	"meta.code;phot.calib;obs.param",	"%c"},
+    {"MagZero_Out",	    "mag",	"arith.zp;phot.calib;obs.param",	"%.6g"},
+    {"MagZero_IntErr",	"mag",	"stat.error;phot.mag;obs.param",	"%.6g"},
+    {"MagZero_RefErr",	"mag",	"stat.error;phot.calib;obs.param",	"%.6g"},
+    {"PhotInstru_Key",	"",	"meta.id;instr.setup;phot.calib",	"%s"},
+    {"MagZero_Key",	    "",	"meta.id;arith.zp;phot.calib",	"%s"},
+    {"ExpoTime_Key",	"",	"meta.id;time.duration.expo",	"%s"},
+    {"AirMass_Key",	    "",	"meta.id;obs.airmass",	"%s"},
+    {"Extinct_Key",	    "",	"meta.id;obs.atmos.extinction",	"%s"},
+    {"PhotomFlag_Key",	"",	"meta.id;obs.atmos",	"%s"},
+    {"PhotFlux_Key",	"",	"meta.id;phot.flux;src",	"%s"},
+    {"PhotFluxerr_Key",	"",	"meta.id;phot.flux;src",	"%s"},
+    {"PhotClip_NSigma",	"",	"meta.id;stat.param;phot",	"%.6g"},
+    {"Phot_Accuracy",	"",	"meta.id;stat.param;phot",	"%.6g"},
+    {"Phot_FlagsMask",	"",	"meta.code.qual",	"%d"},
+    {"Phot_ImaFlagsMask",	"",	"meta.code.qual",	"%d"},
+    {"SN_Thresholds",	"",	"stat.snr;stat.min;phot.flux;obs.param",	"%.6g"},
+    {"FWHM_Thresholds",	"",	"phys.size.diameter;stat.min;instr.det.psf;obs.param",	"%.6g"},
+    {"Ellipticity_Max",	"",	"src.ellipticity;stat.max;obs.param",	"%.6g"},
+    {"Flags_Mask",	    "",	"meta.code.qual",	"%d"},
+    {"WeightFlags_Mask",	"",	"meta.code.qual",	"%d"},
+    {"ImaFlags_Mask",	"",	"meta.code.qual",	"%d"},
+    {"AHeader_Global",	"",	"meta.id;meta.file",	"%s"},
+    {"AHeader_Name",	"",	"meta.id;meta.file",	"%s"},
+    {"AHeader_Suffix",	"",	"meta.id.part;meta.file",	"%s"},
+    {"Header_Name",	    "",	"meta.id;meta.file",	"%s"},
+    {"Header_Suffix",	"",	"meta.id.part;meta.file",	"%s"},
+    {"Header_Type",	    "",	"meta.code;meta.file",	"%s"},
+    {"CheckPlot_CKey",	"",	"meta.id;meta.code",	"%s"},
+    {"CheckPlot_Dev",	"",	"meta.code",	"%s"},
+    {"CheckPlot_Res",	"",	"meta.number;meta",	"%d"},
+    {"CheckPlot_AntiAlias",	"",	"meta.code",	"%c"},
+    {"CheckPlot_Type",	"",	"meta.code",	"%s"},
+    {"CheckPlot_Name",	"",	"meta.id;meta.file",	"%s"},
+    {"CheckImage_Type",	"",	"meta.code",	"%s"},
+    {"CheckImage_Name",	"",	"meta.id;meta.file;meta.fits",	"%s"},
+    {"Verbose_Type",	"",	"meta.code",	"%s"},
+    {"Write_XML",	    "",	"meta.code",	"%s"},
+    {"NThreads",	    "",	"meta.number;meta.software",	"%d"},
+    {"\0",              "\0",   "\0"}
+};
+static int next_param_index = 0;
+static int write_xmlconfigparam(FILE *file, char *name, char *unit,
+        char *ucd, char *format)
+{
+    char        value[MAXCHAR], uunit[MAXCHAR];
+    int     i,j,n;
+
+    for (i=0; key[i].name[0] && cistrcmp(name, key[i].name, FIND_STRICT); i++);
+    if (!key[i].name[0])
+        return RETURN_ERROR;
+
+    if (*unit)
+        sprintf(uunit, " unit=\"%s\"", unit);
+    else
+        *uunit = '\0';
+    switch(key[i].type)
+    {
+        case P_FLOAT:
+            sprintf(value, format, *((double *)key[i].ptr));
+            fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
+                    " ucd=\"%s\" value=\"%s\"/>\n",
+                    name, uunit, ucd, value);
+            break;
+        case P_FLOATLIST:
+            n = *(key[i].nlistptr);
+            if (n)
+            {
+                sprintf(value, format, ((double *)key[i].ptr)[0]);
+                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
+                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
+                        name, uunit, n, ucd, value);
+                for (j=1; j<n; j++)
+                {
+                    sprintf(value, format, ((double *)key[i].ptr)[j]);
+                    fprintf(file, " %s", value);
+                }
+                fprintf(file, "\"/>\n");
+            }
+            else
+                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
+                        " ucd=\"%s\" value=\"\"/>\n",
+                        name, uunit, ucd);
+            break;
+        case P_INT:
+            sprintf(value, format, *((int *)key[i].ptr));
+            fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"int\""
+                    " ucd=\"%s\" value=\"%s\"/>\n",
+                    name, uunit, ucd, value);
+            break;
+        case P_INTLIST:
+            n = *(key[i].nlistptr);
+            if (n)
+            {
+                sprintf(value, format, ((int *)key[i].ptr)[0]);
+                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"int\""
+                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
+                        name, uunit, n, ucd, value);
+                for (j=1; j<n; j++)
+                {
+                    sprintf(value, format, ((int *)key[i].ptr)[j]);
+                    fprintf(file, " %s", value);
+                }
+                fprintf(file, "\"/>\n");
+            }
+            else
+                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
+                        " ucd=\"%s\" value=\"\"/>\n",
+                        name, uunit, ucd);
+            break;
+        case P_BOOL:
+            sprintf(value, "%c", *((int *)key[i].ptr)? 'T':'F');
+            fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
+                    " ucd=\"%s\" value=\"%s\"/>\n",
+                    name, ucd, value);
+            break;
+        case P_BOOLLIST:
+            n = *(key[i].nlistptr);
+            if (n)
+            {
+                sprintf(value, "%c", ((int *)key[i].ptr)[0]? 'T':'F');
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
+                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
+                        name, n, ucd, value);
+                for (j=1; j<n; j++)
+                {
+                    sprintf(value, "%c", ((int *)key[i].ptr)[j]? 'T':'F');
+                    fprintf(file, " %s", value);
+                }
+                fprintf(file, "\"/>\n");
+            }
+            else
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
+                        " ucd=\"%s\" value=\"\"/>\n",
+                        name, ucd);
+            break;
+        case P_STRING:
+            strcpy(value, (char *)key[i].ptr);
+            fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\" arraysize=\"*\""
+                    " ucd=\"%s\" value=\"%s\"/>\n",
+                    name, ucd, value);
+            break;
+        case P_STRINGLIST:
+            n = *(key[i].nlistptr);
+            if (n)
+            {
+                strcpy(value, ((char **)key[i].ptr)[0]);
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
+                        " arraysize=\"*\" ucd=\"%s\" value=\"%s",
+                        name, ucd, value);
+                for (j=1; j<n; j++)
+                {
+                    strcpy(value, ((char **)key[i].ptr)[j]);
+                    fprintf(file, ",%s", value);
+                }
+                fprintf(file, "\"/>\n");
+            }
+            else
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
+                        " arraysize=\"*\" ucd=\"%s\" value=\"\"/>\n",
+                        name, ucd);
+            break;
+        case P_KEY:
+            strcpy(value, key[i].keylist[*((int *)key[i].ptr)]);
+            fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\" arraysize=\"*\""
+                    " ucd=\"%s\" value=\"%s\"/>\n",
+                    name, ucd, value);
+            break;
+        case P_KEYLIST:
+            n = *(key[i].nlistptr);
+            if (n)
+            {
+                strcpy(value, key[i].keylist[((int *)key[i].ptr)[0]]);
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
+                        " arraysize=\"*\" ucd=\"%s\" value=\"%s",
+                        name, ucd, value);
+                for (j=1; j<n; j++)
+                {
+                    strcpy(value, key[i].keylist[((int *)key[i].ptr)[j]]);
+                    fprintf(file, ",%s", value);
+                }
+                fprintf(file, "\"/>\n");
+            }
+            else
+                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
+                        " arraysize=\"*\" ucd=\"%s\" value=\"\"/>\n",
+                        name, ucd);
+            break;
+        default:
+            error(EXIT_FAILURE, "*Internal Error*: Type Unknown",
+                    " in write_xmlconfigparam()");
+    }
+
+    return RETURN_OK;
+}
+
 void
 Json_write(char *filename)
 {
@@ -1040,7 +1295,11 @@ Json_write(char *filename)
 
 
     /* config file */
-    /* TODO */
+    char *param_name; 
+    char *param_unit;
+    char *param_datatype; 
+    char *param_ucd;
+    //while (get_next_config_param(&param_name, &param_unit, &param_datatype, &param_ucd)
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
