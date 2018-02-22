@@ -229,12 +229,13 @@ get_next_fgroup_plot(char**name) {
 }
 #endif /* HAVE_PLPLOT */
 
-struct conf_params {
+typedef struct {
     char *name;
     char *unit;
     char *ucd;
-    char *format;};
-static const struct conf_params params[] = {
+    char *format;
+} conf_param;
+static const conf_param params[] = {
     {"FGroup_Radius",	"arcmin",	"phot.calib;obs.param",	"%.6g"},
     {"Ref_Server",	    "",	    "meta.ref.url",	"%s"},
     {"Ref_TimeOut",	    "s",	"meta;time.duration",	"%.2g"},
@@ -327,161 +328,59 @@ static const struct conf_params params[] = {
     {"Verbose_Type",	"",	"meta.code",	"%s"},
     {"Write_XML",	    "",	"meta.code",	"%s"},
     {"NThreads",	    "",	"meta.number;meta.software",	"%d"},
-    {"\0",              "\0",   "\0"}
+    {"",                "",   ""}
 };
+typedef enum {END_OF_PARAM, WRONG_PARAM, PARAM_OK} param_reply_status;
+typedef struct {
+    conf_param          param;
+    int                 nelems;
+    param_reply_status  status;
+    int                 type;
+    void                *data;
+} conf_param_reply;
 static int next_param_index = 0;
-static int write_xmlconfigparam(FILE *file, char *name, char *unit,
-        char *ucd, char *format)
+static conf_param_reply
+get_next_param() 
 {
-    char        value[MAXCHAR], uunit[MAXCHAR];
-    int     i,j,n;
+    conf_param p = params[next_param_index++];
 
-    for (i=0; key[i].name[0] && cistrcmp(name, key[i].name, FIND_STRICT); i++);
-    if (!key[i].name[0])
-        return RETURN_ERROR;
-
-    if (*unit)
-        sprintf(uunit, " unit=\"%s\"", unit);
-    else
-        *uunit = '\0';
-    switch(key[i].type)
-    {
-        case P_FLOAT:
-            sprintf(value, format, *((double *)key[i].ptr));
-            fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
-                    " ucd=\"%s\" value=\"%s\"/>\n",
-                    name, uunit, ucd, value);
-            break;
-        case P_FLOATLIST:
-            n = *(key[i].nlistptr);
-            if (n)
-            {
-                sprintf(value, format, ((double *)key[i].ptr)[0]);
-                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
-                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
-                        name, uunit, n, ucd, value);
-                for (j=1; j<n; j++)
-                {
-                    sprintf(value, format, ((double *)key[i].ptr)[j]);
-                    fprintf(file, " %s", value);
-                }
-                fprintf(file, "\"/>\n");
-            }
-            else
-                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
-                        " ucd=\"%s\" value=\"\"/>\n",
-                        name, uunit, ucd);
-            break;
-        case P_INT:
-            sprintf(value, format, *((int *)key[i].ptr));
-            fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"int\""
-                    " ucd=\"%s\" value=\"%s\"/>\n",
-                    name, uunit, ucd, value);
-            break;
-        case P_INTLIST:
-            n = *(key[i].nlistptr);
-            if (n)
-            {
-                sprintf(value, format, ((int *)key[i].ptr)[0]);
-                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"int\""
-                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
-                        name, uunit, n, ucd, value);
-                for (j=1; j<n; j++)
-                {
-                    sprintf(value, format, ((int *)key[i].ptr)[j]);
-                    fprintf(file, " %s", value);
-                }
-                fprintf(file, "\"/>\n");
-            }
-            else
-                fprintf(file, "   <PARAM name=\"%s\"%s datatype=\"double\""
-                        " ucd=\"%s\" value=\"\"/>\n",
-                        name, uunit, ucd);
-            break;
-        case P_BOOL:
-            sprintf(value, "%c", *((int *)key[i].ptr)? 'T':'F');
-            fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
-                    " ucd=\"%s\" value=\"%s\"/>\n",
-                    name, ucd, value);
-            break;
-        case P_BOOLLIST:
-            n = *(key[i].nlistptr);
-            if (n)
-            {
-                sprintf(value, "%c", ((int *)key[i].ptr)[0]? 'T':'F');
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
-                        " arraysize=\"%d\" ucd=\"%s\" value=\"%s",
-                        name, n, ucd, value);
-                for (j=1; j<n; j++)
-                {
-                    sprintf(value, "%c", ((int *)key[i].ptr)[j]? 'T':'F');
-                    fprintf(file, " %s", value);
-                }
-                fprintf(file, "\"/>\n");
-            }
-            else
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"boolean\""
-                        " ucd=\"%s\" value=\"\"/>\n",
-                        name, ucd);
-            break;
-        case P_STRING:
-            strcpy(value, (char *)key[i].ptr);
-            fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\" arraysize=\"*\""
-                    " ucd=\"%s\" value=\"%s\"/>\n",
-                    name, ucd, value);
-            break;
-        case P_STRINGLIST:
-            n = *(key[i].nlistptr);
-            if (n)
-            {
-                strcpy(value, ((char **)key[i].ptr)[0]);
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
-                        " arraysize=\"*\" ucd=\"%s\" value=\"%s",
-                        name, ucd, value);
-                for (j=1; j<n; j++)
-                {
-                    strcpy(value, ((char **)key[i].ptr)[j]);
-                    fprintf(file, ",%s", value);
-                }
-                fprintf(file, "\"/>\n");
-            }
-            else
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
-                        " arraysize=\"*\" ucd=\"%s\" value=\"\"/>\n",
-                        name, ucd);
-            break;
-        case P_KEY:
-            strcpy(value, key[i].keylist[*((int *)key[i].ptr)]);
-            fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\" arraysize=\"*\""
-                    " ucd=\"%s\" value=\"%s\"/>\n",
-                    name, ucd, value);
-            break;
-        case P_KEYLIST:
-            n = *(key[i].nlistptr);
-            if (n)
-            {
-                strcpy(value, key[i].keylist[((int *)key[i].ptr)[0]]);
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
-                        " arraysize=\"*\" ucd=\"%s\" value=\"%s",
-                        name, ucd, value);
-                for (j=1; j<n; j++)
-                {
-                    strcpy(value, key[i].keylist[((int *)key[i].ptr)[j]]);
-                    fprintf(file, ",%s", value);
-                }
-                fprintf(file, "\"/>\n");
-            }
-            else
-                fprintf(file, "   <PARAM name=\"%s\" datatype=\"char\""
-                        " arraysize=\"*\" ucd=\"%s\" value=\"\"/>\n",
-                        name, ucd);
-            break;
-        default:
-            error(EXIT_FAILURE, "*Internal Error*: Type Unknown",
-                    " in write_xmlconfigparam()");
+    conf_param_reply reply;
+    reply.param = p;
+    if (strlen(p.name) == 0) {
+        reply.status = END_OF_PARAM;
+        return reply;
     }
 
-    return RETURN_OK;
+    int i;
+    for (i=0; key[i].name[0] && cistrcmp(p.name, key[i].name, FIND_STRICT); i++);
+    if (!key[i].name[0]) {
+        reply.status = WRONG_PARAM;
+        return reply;
+    }
+
+    reply.type = key[i].type;
+    reply.nelems = 0;
+    reply.status = PARAM_OK;
+    switch (key[i].type) {
+        case P_FLOAT:
+        case P_INT:
+        case P_BOOL:
+        case P_STRING:
+        case P_KEY:
+            break;
+        case P_FLOATLIST:
+        case P_INTLIST:
+        case P_BOOLLIST:
+        case P_STRINGLIST:
+        case P_KEYLIST:
+            reply.nelems = *(key[i].nlistptr);
+            break;
+        default:
+            reply.status = WRONG_PARAM;
+    }
+
+    return reply;
+ 
 }
 
 void
@@ -1295,11 +1194,40 @@ Json_write(char *filename)
 
 
     /* config file */
-    char *param_name; 
-    char *param_unit;
-    char *param_datatype; 
-    char *param_ucd;
-    //while (get_next_config_param(&param_name, &param_unit, &param_datatype, &param_ucd)
+    json_object *conf_array = json_object_new_array();
+    conf_param_reply reply;
+    for (reply = get_next_param(); reply.status != END_OF_PARAM; reply = get_next_param())
+    {
+        if (reply.status != PARAM_OK)
+            continue;
+        
+        char type[30];
+        switch(reply.type) {
+            case P_FLOAT:
+            case P_FLOATLIST:
+                break;
+            case P_INT:
+            case P_INTLIST:
+                break;
+            case P_BOOL:
+            case P_BOOLLIST:
+                break;
+            case P_STRING:
+            case P_STRINGLIST:
+            case P_KEY:
+            case P_KEYLIST:
+                break;
+        }
+        o = new_json_object(reply.param.name, type, reply.param.unit,
+                                                              reply.param.ucd);
+
+        if (reply.nelems > 0) {
+            int strpos = 0;
+            for (i=0; i<reply.nelems; i++) {
+            }
+        }
+
+    }
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
