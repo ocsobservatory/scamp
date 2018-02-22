@@ -361,12 +361,15 @@ get_next_param()
     reply.type = key[i].type;
     reply.nelems = 0;
     reply.status = PARAM_OK;
+    reply.data = key[i].ptr;
     switch (key[i].type) {
         case P_FLOAT:
         case P_INT:
         case P_BOOL:
         case P_STRING:
+            break;
         case P_KEY:
+            reply.data = key[i].keylist[*((int*)key[i].ptr)];
             break;
         case P_FLOATLIST:
         case P_INTLIST:
@@ -1169,7 +1172,7 @@ Json_write(char *filename)
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_cols, o);
 
-        o = new_json_object("Time", "char", "None", "meta");
+        o = new_json_object("Text", "char", "None", "meta");
         strncpy(strbuff, &warnstr[22], MAXCHAR);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_cols, o);
@@ -1196,38 +1199,71 @@ Json_write(char *filename)
     /* config file */
     json_object *conf_array = json_object_new_array();
     conf_param_reply reply;
-    for (reply = get_next_param(); reply.status != END_OF_PARAM; reply = get_next_param())
+    for (reply = get_next_param(), i=0; reply.status != END_OF_PARAM; reply = get_next_param(), i++)
     {
         if (reply.status != PARAM_OK)
             continue;
         
-        char type[30];
-        switch(reply.type) {
+        char type[30] = "";
+        json_object *val;
+        switch (reply.type) {
             case P_FLOAT:
-            case P_FLOATLIST:
+                strcpy(type, "float");
+                val = json_object_new_double(*((float*)reply.data));
                 break;
             case P_INT:
-            case P_INTLIST:
+                strcpy(type, "int");
+                val = json_object_new_int(*((int*)reply.data));
                 break;
             case P_BOOL:
-            case P_BOOLLIST:
+                strcpy(type, "bool");
+                val = json_object_new_int(*((int*)reply.data));
                 break;
             case P_STRING:
-            case P_STRINGLIST:
+                strcpy(type, "char");
+                val = json_object_new_string(((char*)reply.data));
+                val = json_object_new_string("hello");
+                break;
             case P_KEY:
+                strcpy(type, "char");
+                val = json_object_new_string(((char*)reply.data));
+                val = json_object_new_string("hello");
+                break;
+            case P_FLOATLIST:
+                strcpy(type, "float");
+                val = json_object_new_array();
+                for (j=0; j<reply.nelems; j++)
+                    json_object_array_add(val, json_object_new_double(((float*)reply.data)[j]));
+                break;
+            case P_BOOLLIST:
+            case P_INTLIST:
+                strcpy(type, "int");
+                val = json_object_new_array();
+                //for (j=0; j<reply.nelems; j++)
+                    //json_object_array_add(val, json_object_new_int(((int*)reply.data)[j]));
+                break;
             case P_KEYLIST:
+            case P_STRINGLIST:
+                strcpy(type, "char");
+                val = json_object_new_array();
+                //for (j=0; j<reply.nelems; j++)
+                    //json_object_array_add(val, json_object_new_string("hello"));
+                    //json_object_array_add(val, json_object_new_string(((char**)reply.data)[j]));
                 break;
         }
+
         o = new_json_object(reply.param.name, type, reply.param.unit,
                                                               reply.param.ucd);
-
-        if (reply.nelems > 0) {
-            int strpos = 0;
-            for (i=0; i<reply.nelems; i++) {
-            }
-        }
+        json_object_object_add(o, "value", val);
+        json_object_array_add(conf_array, o);
 
     }
+
+    o = json_object_new_object();
+    json_object_object_add(o, "data", conf_array);
+    json_object_object_add(o, "number", json_object_new_int(i));
+    json_object_object_add(tables, "Configuration", o);
+
 
     char *output = (char*) json_object_to_json_string(main_obj);
 
