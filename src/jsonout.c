@@ -229,163 +229,6 @@ get_next_fgroup_plot(char**name) {
 }
 #endif /* HAVE_PLPLOT */
 
-typedef struct {
-    char *name;
-    char *unit;
-    char *ucd;
-    char *format;
-} conf_param;
-static const conf_param params[] = {
-    {"FGroup_Radius",	"arcmin",	"phot.calib;obs.param",	"%.6g"},
-    {"Ref_Server",	    "",	    "meta.ref.url",	"%s"},
-    {"Ref_TimeOut",	    "s",	"meta;time.duration",	"%.2g"},
-    {"AstRef_Catalog",	"",	    "meta.code;meta.file",	"%s"},
-    {"AstRef_Band",	    "",	    "instr.bandpass",	"%s"},
-    {"AstRefCat_Name",	"",	    "meta.id;meta.file;meta.dataset",	"%s"},
-    {"AstRefCent_Keys",	"",	    "meta.id;pos.eq",	"%s"},
-    {"AstRefErr_Keys",	"",	    "meta.id;pos.errorEllipse",	"%s"},
-    {"AstRefMag_Key",	"",	    "meta.id;phot.mag",	"%s"},
-    {"AstRefMagErr_Key",	"",	"meta.id;phot.mag",	"%s"},
-    {"AstRefObsDate_Key",	"",	"meta.id;time.epoch",	"%s"},
-    {"AstRefMag_Limits",	"mag",	"phot.mag;stat.min;stat.max;obs.param",	"%.6g"},
-    {"Save_RefCatalog",	"",	    "meta.code",	"%c"},
-    {"RefOut_CatPath",	"",	    "meta.id;meta.file",	"%s"},
-    {"MergedOutCat_Name",	"",	"meta.id;meta.file;meta.dataset",	"%s"},
-    {"MergedOutCat_Type",	"",	"meta.code;meta.dataset",	"%s"},
-    {"Save_DGeoMap",	"",	    "meta.code",	"%c"},
-    {"DGeoMap_Name",	"",	    "meta.id;meta.file;meta.dataset",	"%s"},
-    {"DGeoMap_Step",	"pix",	"meta.number",	"%d"},
-    {"DGeoMap_NNearest",	"",	"meta.number",	"%d"},
-    {"FullOutCat_Name",	"",	"meta.id;meta.file;meta.dataset",	"%s"},
-    {"FullOutCat_Type",	"",	"meta.code;meta.dataset",	"%s"},
-    {"Match",	        "",	"meta.code;obs.param",	"%c"},
-    {"Match_NMax",	    "",	"meta.number;src;obs.param",	"%d"},
-    {"PixScale_MaxErr",	"",	"instr.precision;instr.pixel;obs.param",	"%.6g"},
-    {"PosAngle_MaxErr",	"deg",	"instr.precision;pos.posAng;obs.param",	"%.6g"},
-    {"Position_MaxErr",	"arcmin",	"instr.precision;pos.eq;obs.param",	"%.6g"},
-    {"Match_Resol",	    "arcsec",	"stat.param;phys.angSize",	"%.6g"},
-    {"Match_Flipped",	"",	"instr.param;obs.param",	"%c"},
-    {"Mosaic_Type",	    "",	"instr.param;obs.param",	"%s"},
-    {"FixFocalPlane_NMin",	"",	"meta.number;src;obs.param",	"%d"},
-    {"CrossId_Radius",	"arcsec",	"pos.angDistance;stat.max",	"%.6g"},
-    {"Solve_Astrom",	"",	"meta.code;obs.param",	"%c"},
-    {"Projection_Type",	"",	"instr.param;obs.param",	"%s"},
-    {"AstrInstru_Key",	"",	"meta.id;instr.setup;pos",	"%s"},
-    {"Stability_Type",	"",	"instr.param;obs.param",	"%s"},
-    {"Centroid_Keys",	"",	"meta.id;pos.barycenter;src",	"%s"},
-    {"CentroidErr_Keys",	"",	"meta.id;pos.errorEllipse;src",	"%s"},
-    {"Distort_Keys",	"",	"meta.id;stat.fit.param;src",	"%s"},
-    {"Distort_Groups",	"",	"meta.id;stat.fit.param",	"%d"},
-    {"Distort_Degrees",	"",	"meta.id;stat.fit.param",	"%d"},
-    {"FocDistort_Degree",	"",	"meta.id;stat.fit.param",	"%d"},
-    {"Astref_Weight",	"",	"meta.id;stat.fit.param",	"%.6g"},
-    {"AstrAccuracy_Type",	"",	"instr.param;obs.param",	"%s"},
-    {"AstrAccuracy_Key",	"",	"meta.id;stat.fit.param;src",	"%s"},
-    {"Astr_Accuracy",	"",	"meta.id;stat.param;pos",	"%.6g"},
-    {"AstrClip_NSigma",	"",	"meta.id;stat.param;pos",	"%.6g"},
-    {"Compute_Parallaxes",	"",	"meta.code;obs.param",	"%c"},
-    {"Compute_ProperMotions",	"",	"meta.code;obs.param",	"%c"},
-    {"Correct_ColourShifts",	"",	"meta.code;obs.param",	"%c"},
-    {"Include_AstRefCatalog",	"",	"meta.code;obs.param",	"%c"},
-    {"Astr_FlagsMask",	"",	"meta.code.qual",	"%d"},
-    {"Astr_ImaFlagsMask",	"",	"meta.code.qual",	"%d"},
-    {"Solve_Photom",	"",	"meta.code;phot.calib;obs.param",	"%c"},
-    {"MagZero_Out",	    "mag",	"arith.zp;phot.calib;obs.param",	"%.6g"},
-    {"MagZero_IntErr",	"mag",	"stat.error;phot.mag;obs.param",	"%.6g"},
-    {"MagZero_RefErr",	"mag",	"stat.error;phot.calib;obs.param",	"%.6g"},
-    {"PhotInstru_Key",	"",	"meta.id;instr.setup;phot.calib",	"%s"},
-    {"MagZero_Key",	    "",	"meta.id;arith.zp;phot.calib",	"%s"},
-    {"ExpoTime_Key",	"",	"meta.id;time.duration.expo",	"%s"},
-    {"AirMass_Key",	    "",	"meta.id;obs.airmass",	"%s"},
-    {"Extinct_Key",	    "",	"meta.id;obs.atmos.extinction",	"%s"},
-    {"PhotomFlag_Key",	"",	"meta.id;obs.atmos",	"%s"},
-    {"PhotFlux_Key",	"",	"meta.id;phot.flux;src",	"%s"},
-    {"PhotFluxerr_Key",	"",	"meta.id;phot.flux;src",	"%s"},
-    {"PhotClip_NSigma",	"",	"meta.id;stat.param;phot",	"%.6g"},
-    {"Phot_Accuracy",	"",	"meta.id;stat.param;phot",	"%.6g"},
-    {"Phot_FlagsMask",	"",	"meta.code.qual",	"%d"},
-    {"Phot_ImaFlagsMask",	"",	"meta.code.qual",	"%d"},
-    {"SN_Thresholds",	"",	"stat.snr;stat.min;phot.flux;obs.param",	"%.6g"},
-    {"FWHM_Thresholds",	"",	"phys.size.diameter;stat.min;instr.det.psf;obs.param",	"%.6g"},
-    {"Ellipticity_Max",	"",	"src.ellipticity;stat.max;obs.param",	"%.6g"},
-    {"Flags_Mask",	    "",	"meta.code.qual",	"%d"},
-    {"WeightFlags_Mask",	"",	"meta.code.qual",	"%d"},
-    {"ImaFlags_Mask",	"",	"meta.code.qual",	"%d"},
-    {"AHeader_Global",	"",	"meta.id;meta.file",	"%s"},
-    {"AHeader_Name",	"",	"meta.id;meta.file",	"%s"},
-    {"AHeader_Suffix",	"",	"meta.id.part;meta.file",	"%s"},
-    {"Header_Name",	    "",	"meta.id;meta.file",	"%s"},
-    {"Header_Suffix",	"",	"meta.id.part;meta.file",	"%s"},
-    {"Header_Type",	    "",	"meta.code;meta.file",	"%s"},
-    {"CheckPlot_CKey",	"",	"meta.id;meta.code",	"%s"},
-    {"CheckPlot_Dev",	"",	"meta.code",	"%s"},
-    {"CheckPlot_Res",	"",	"meta.number;meta",	"%d"},
-    {"CheckPlot_AntiAlias",	"",	"meta.code",	"%c"},
-    {"CheckPlot_Type",	"",	"meta.code",	"%s"},
-    {"CheckPlot_Name",	"",	"meta.id;meta.file",	"%s"},
-    {"CheckImage_Type",	"",	"meta.code",	"%s"},
-    {"CheckImage_Name",	"",	"meta.id;meta.file;meta.fits",	"%s"},
-    {"Verbose_Type",	"",	"meta.code",	"%s"},
-    {"Write_XML",	    "",	"meta.code",	"%s"},
-    {"NThreads",	    "",	"meta.number;meta.software",	"%d"},
-    {"",                "",   ""}
-};
-typedef enum {END_OF_PARAM, WRONG_PARAM, PARAM_OK} param_reply_status;
-typedef struct {
-    conf_param          param;
-    int                 nelems;
-    param_reply_status  status;
-    int                 type;
-    void                *data;
-} conf_param_reply;
-static int next_param_index = 0;
-static conf_param_reply
-get_next_param() 
-{
-    conf_param p = params[next_param_index++];
-
-    conf_param_reply reply;
-    reply.param = p;
-    if (strlen(p.name) == 0) {
-        reply.status = END_OF_PARAM;
-        return reply;
-    }
-
-    int i;
-    for (i=0; key[i].name[0] && cistrcmp(p.name, key[i].name, FIND_STRICT); i++);
-    if (!key[i].name[0]) {
-        reply.status = WRONG_PARAM;
-        return reply;
-    }
-
-    reply.type = key[i].type;
-    reply.nelems = 0;
-    reply.status = PARAM_OK;
-    reply.data = key[i].ptr;
-    switch (key[i].type) {
-        case P_FLOAT:
-        case P_INT:
-        case P_BOOL:
-        case P_STRING:
-            break;
-        case P_KEY:
-            reply.data = key[i].keylist[*((int*)key[i].ptr)];
-            break;
-        case P_FLOATLIST:
-        case P_INTLIST:
-        case P_BOOLLIST:
-        case P_STRINGLIST:
-        case P_KEYLIST:
-            reply.nelems = *(key[i].nlistptr);
-            break;
-        default:
-            reply.status = WRONG_PARAM;
-    }
-
-    return reply;
- 
-}
-
 void
 Json_write(char *filename)
 {
@@ -1191,74 +1034,82 @@ Json_write(char *filename)
 
     /* command line */
     strbuff[0] = '\0';
+    int pos = 0;
     for (i=0; i<prefs.ncommand_line; i++)
-        snprintf(strbuff, MAXCHAR - strlen(strbuff), "%s ", prefs.command_line[i]);
+        pos += snprintf(&strbuff[pos], MAXCHAR - strlen(strbuff), "%s ", prefs.command_line[i]);
     json_object_object_add(main_obj, "CommandLine", json_object_new_string(strbuff));
 
 
     /* config file */
     json_object *conf_array = json_object_new_array();
-    conf_param_reply reply;
-    for (reply = get_next_param(), i=0; reply.status != END_OF_PARAM; reply = get_next_param(), i++)
-    {
-        if (reply.status != PARAM_OK)
-            continue;
-        
-        char type[30] = "";
+    int cpos;
+    for (i=0; key[i].name[0]; i++) {                                               
+        o = json_object_new_object();
         json_object *val;
-        switch (reply.type) {
-            case P_FLOAT:
-                strcpy(type, "float");
-                val = json_object_new_double(*((float*)reply.data));
-                break;
-            case P_INT:
-                strcpy(type, "int");
-                val = json_object_new_int(*((int*)reply.data));
-                break;
-            case P_BOOL:
-                strcpy(type, "bool");
-                val = json_object_new_int(*((int*)reply.data));
-                break;
-            case P_STRING:
-                strcpy(type, "char");
-                val = json_object_new_string(((char*)reply.data));
-                val = json_object_new_string("hello");
-                break;
-            case P_KEY:
-                strcpy(type, "char");
-                val = json_object_new_string(((char*)reply.data));
-                val = json_object_new_string("hello");
-                break;
-            case P_FLOATLIST:
-                strcpy(type, "float");
-                val = json_object_new_array();
-                for (j=0; j<reply.nelems; j++)
-                    json_object_array_add(val, json_object_new_double(((float*)reply.data)[j]));
-                break;
-            case P_BOOLLIST:
-            case P_INTLIST:
-                strcpy(type, "int");
-                val = json_object_new_array();
-                //for (j=0; j<reply.nelems; j++)
-                    //json_object_array_add(val, json_object_new_int(((int*)reply.data)[j]));
-                break;
-            case P_KEYLIST:
-            case P_STRINGLIST:
-                strcpy(type, "char");
-                val = json_object_new_array();
-                //for (j=0; j<reply.nelems; j++)
-                    //json_object_array_add(val, json_object_new_string("hello"));
-                    //json_object_array_add(val, json_object_new_string(((char**)reply.data)[j]));
-                break;
+        switch (key[i].type) {                                                     
+            case P_FLOAT:                                                          
+                val = json_object_new_double(*((float*)key[i].ptr));
+                break;                                                             
+            case P_INT:                                                            
+                val = json_object_new_int(*((int*)key[i].ptr));
+                break;                                                             
+            case P_BOOL:                                                           
+                sprintf(strbuff, "%c", *((int*)key[i].ptr) ? 'T' : 'F');
+                val = json_object_new_int(*((int*)key[i].ptr));
+                break;                                                             
+            case P_STRING:                                                         
+                val = json_object_new_string(((char*)key[i].ptr));
+                break;                                                             
+            case P_KEY:                                                            
+                val = json_object_new_string(key[i].keylist[*((int*)key[i].ptr)]);
+                break;                                                             
+            case P_FLOATLIST:                                                      
+                cpos = 0;                                                          
+                for (j=0; j< *(key[i].nlistptr); j++)                              
+                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%f, ",          
+                                ((double*)key[i].ptr)[j]);                         
+                strbuff[cpos-2] = '\0';                                               
+                val = json_object_new_string(strbuff);
+                break;                                                             
+            case P_INTLIST:                                                        
+                cpos = 0;                                                          
+                for (j=0; j< *(key[i].nlistptr); j++)                              
+                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%i, ",          
+                                ((int*)key[i].ptr)[j]);                            
+                strbuff[cpos-2] = '\0';                                               
+                val = json_object_new_string(strbuff);
+                break;                                                             
+            case P_BOOLLIST:                                                       
+                cpos = 0;                                                          
+                for (j=0; j< *(key[i].nlistptr); j++)                              
+                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%c, ",          
+                                ((int*)key[i].ptr)[j] ? 'T' : 'F');                
+                strbuff[cpos-2] = '\0';                                               
+                val = json_object_new_string(strbuff);
+                break;                                                             
+            case P_STRINGLIST:                                                     
+                cpos = 0;                                                          
+                for (j=0; j< *(key[i].nlistptr); j++)                              
+                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%s, ",          
+                                ((char**)key[i].ptr)[j]);                          
+                strbuff[cpos-2] = '\0';                                               
+                val = json_object_new_string(strbuff);
+                break;                                                             
+            case P_KEYLIST:                                                        
+                cpos = 0;                                                          
+                for (j=0; j< *(key[i].nlistptr); j++)                              
+                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%s, ",          
+                                key[i].keylist[((int*)key[i].ptr)[j]]);            
+                strbuff[cpos-2] = '\0';                                               
+                val = json_object_new_string(strbuff);
+                break;                                                             
         }
 
-        o = new_json_object(reply.param.name, type, reply.param.unit,
-                                                              reply.param.ucd);
+        json_object_object_add(o, "key", json_object_new_string(key[i].name));
         json_object_object_add(o, "value", val);
         json_object_array_add(conf_array, o);
-
-    }
-
+                                                                                   
+    }   
     o = json_object_new_object();
     json_object_object_add(o, "data", conf_array);
     json_object_object_add(o, "number", json_object_new_int(i));
