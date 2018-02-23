@@ -42,8 +42,9 @@ new_json_object(
     json_object *o = json_object_new_object();
     json_object_object_add(o, "name", json_object_new_string(name));
     json_object_object_add(o, "datatype", json_object_new_string(type));
-    json_object_object_add(o, "unit", json_object_new_string(unit));
     json_object_object_add(o, "ucd",  json_object_new_string(ucd));
+    if (unit)
+        json_object_object_add(o, "unit", json_object_new_string(unit));
 
     return o;
 }
@@ -235,11 +236,10 @@ Json_write(char *filename)
     json_object *main_obj = json_object_new_object();
     json_object *tables = json_object_new_object();
 
-    json_object *o;
+    json_object *o, *p, *item;
     int i, j;
 
     char strbuff[MAXCHAR];
-    int  strbuffpos;
 
     char *psuser, *pshost, *pspath;
     psuser = pshost = pspath = NULL;
@@ -253,56 +253,56 @@ Json_write(char *filename)
     /* soft meta */
     json_object *soft = json_object_new_array();
 
-    o = new_json_object("Name", "char", "None", "meta.title;meta.software");
+    o = new_json_object("Name", "string", NULL, "meta.title;meta.software");
     json_object_object_add(o, "value", json_object_new_string(BANNER));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Version", "char", "None", "meta.version;meta.software");
+    o = new_json_object("Version", "string", NULL, "meta.version;meta.software");
     json_object_object_add(o, "value", json_object_new_string(MYVERSION));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Url", "char", "None", "meta.ref.url;meta.software");
+    o = new_json_object("Url", "string", NULL, "meta.ref.url;meta.software");
     json_object_object_add(o, "value", json_object_new_string(WEBSITE));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Author", "char", "None", "meta.bib.author;meta.software");
+    o = new_json_object("Author", "string", NULL, "meta.bib.author;meta.software");
     json_object_object_add(o, "value", json_object_new_string("Emmanuel Bertin"));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Ref", "char", "None", "meta.bib.bibcode;meta.software");
+    o = new_json_object("Ref", "string", NULL, "meta.bib.bibcode;meta.software");
     json_object_object_add(o, "value", json_object_new_string("2006ASPC..351..112B"));
     json_object_array_add(soft, o);
 
-    o = new_json_object("NThreads", "int", "None", "meta.number;meta.software");
+    o = new_json_object("NThreads", "int", NULL, "meta.number;meta.software");
     json_object_object_add(o, "value", json_object_new_int(prefs.nthreads));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Date", "char", "None", "time.end;meta.software");
+    o = new_json_object("Date", "string", NULL, "time.end;meta.software");
     json_object_object_add(o, "value", json_object_new_string(prefs.sdate_end));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Time", "char", "None", "time.end;meta.software");
+    o = new_json_object("Time", "string", NULL, "time.end;meta.software");
     json_object_object_add(o, "value", json_object_new_string(prefs.stime_end));
     json_object_array_add(soft, o);
 
-    o = new_json_object("Duration", "float", "None", "time.duration;meta.software");
+    o = new_json_object("Duration", "float", NULL, "time.duration;meta.software");
     json_object_object_add(o, "value", json_object_new_double(prefs.time_diff));
     json_object_array_add(soft, o);
 
     if (psuser) {
-        o = new_json_object("User", "char", "None", "meta.curation");
+        o = new_json_object("User", "string", NULL, "meta.curation");
         json_object_object_add(o, "value", json_object_new_string(psuser));
         json_object_array_add(soft, o);
     }
 
     if (pshost) {
-        o = new_json_object("Host", "char", "None", "meta.curation");
+        o = new_json_object("Host", "string", NULL, "meta.curation");
         json_object_object_add(o, "value", json_object_new_string(pshost));
         json_object_array_add(soft, o);
     }
 
     if (pspath) {
-        o = new_json_object("Path", "char", "None", "meta.dataset");
+        o = new_json_object("Path", "string", NULL, "meta.dataset");
         json_object_object_add(o, "value", json_object_new_string(pspath));
         json_object_array_add(soft, o);
     }
@@ -346,7 +346,7 @@ Json_write(char *filename)
             pstr = plotfilename+strlen(plotfilename);
         sprintf(pstr, "_1.png");
 
-        o = new_json_object("AllSkyPlot", "char", "None", "meta.id;meta.dataset");
+        o = new_json_object("AllSkyPlot", "string", NULL, "meta.id;meta.dataset");
         json_object_object_add(o, "value", json_object_new_string(plotfilename));
         json_object_object_add(main_obj, "AllSkyPlot", o);
 
@@ -359,61 +359,61 @@ Json_write(char *filename)
         fieldstruct *field = json_fields[i];
         json_object *field_row = json_object_new_array();
 
-        o = new_json_object("Catalog_Number", "int", "None", "meta.record;meta.table;meta.file");
+        o = new_json_object("Catalog_Number", "int", NULL, "meta.record;meta.table;meta.file");
         json_object_object_add(o, "value", json_object_new_int(field->fieldindex + 1));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Catalog_Name", "char", "None", "meta.id;meta.table;meta.file");
+        o = new_json_object("Catalog_Name", "string", NULL, "meta.id;meta.table;meta.file");
         json_object_object_add(o, "value", json_object_new_string(field->rfilename));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Image_Ident", "char", "None", "meta.id;obs.field");
+        o = new_json_object("Image_Ident", "string", NULL, "meta.id;obs.field");
         json_object_object_add(o, "value", json_object_new_string(field->ident));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NExtensions", "int", "None", "meta.record");
+        o = new_json_object("NExtensions", "int", NULL, "meta.record");
         json_object_object_add(o, "value", json_object_new_int(field->nset));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NAxis", "int", "None", "pos.wcs.naxis");
+        o = new_json_object("NAxis", "int", NULL, "pos.wcs.naxis");
         json_object_object_add(o, "value", json_object_new_int(field->naxis));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Lng_Axis", "int", "None", "meta.id;pos.eq.ra");
+        o = new_json_object("Lng_Axis", "int", NULL, "meta.id;pos.eq.ra");
         json_object_object_add(o, "value", json_object_new_int(field->lng));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Lat_Axis", "int", "None", "meta.id;pos.eq.dec");
+        o = new_json_object("Lat_Axis", "int", NULL, "meta.id;pos.eq.dec");
         json_object_object_add(o, "value", json_object_new_int(field->lat));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Ext_Header", "boolean", "None", "meta.code");
+        o = new_json_object("Ext_Header", "boolean", NULL, "meta.code");
         json_object_object_add(o, "value", json_object_new_boolean(field->headflag));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NDetect", "int", "None", "meta.number;src");
+        o = new_json_object("NDetect", "int", NULL, "meta.number;src");
         json_object_object_add(o, "value", json_object_new_int(field->nsample));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Group", "int", "None", "meta.id.parent;meta.dataset");
+        o = new_json_object("Group", "int", NULL, "meta.id.parent;meta.dataset");
         json_object_object_add(o, "value", json_object_new_int(field->fgroup->no));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Astr_Instrum", "char", "None", "meta.id.parent;meta.dataset");
+        o = new_json_object("Astr_Instrum", "string", NULL, "meta.id.parent;meta.dataset");
         snprintf(strbuff, MAXCHAR, "A%d", field->astromlabel+1);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Phot_Instrum", "char", "None", "meta.id.parent;meta.dataset");
+        o = new_json_object("Phot_Instrum", "string", NULL, "meta.id.parent;meta.dataset");
         snprintf(strbuff, MAXCHAR, "P%d", field->photomlabel+1);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Photom_Flag", "boolean", "None", "meta.code;phot");
+        o = new_json_object("Photom_Flag", "boolean", NULL, "meta.code;phot");
         json_object_object_add(o, "value", json_object_new_boolean(field->photomflag));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Photom_Link", "boolean", "None", "meta.code;phot");
+        o = new_json_object("Photom_Link", "boolean", NULL, "meta.code;phot");
         json_object_object_add(o, "value", json_object_new_boolean(field->photomflag));
         json_object_array_add(field_row, o);
 
@@ -421,26 +421,26 @@ Json_write(char *filename)
         json_object_object_add(o, "value", json_object_new_double(field->epoch));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Exposure_Time", "float", "None", "time.duration;obs.exposure");
+        o = new_json_object("Exposure_Time", "float", NULL, "time.duration;obs.exposure");
         json_object_object_add(o, "value", json_object_new_double(field->expotime));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AirMass", "float", "None", "obs.airMass");
+        o = new_json_object("AirMass", "float", NULL, "obs.airMass");
         json_object_object_add(o, "value", json_object_new_double(field->airmass));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Field_Coordinates", "double", "%s", "pos.eq.ra;pos.eq.dec;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("Field_Coordinates", "double array", "%s", "pos.eq.ra;pos.eq.dec;obs.field");
+        p = json_object_new_array();
         for (j=0; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.10g ", field->meanwcspos[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->meanwcspos[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Pixel_Scale", "float", "%s", "instr.scale;instr.pixel;stat.mean");
-        strbuffpos = 0;
+        o = new_json_object("Pixel_Scale", "float array", "%s", "instr.scale;instr.pixel;stat.mean");
+        p = json_object_new_array();
         for (j=1; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", field->meanwcsscale[j] * deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->meanwcsscale[j] * deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
         o = new_json_object("Max_Radius", "float", "%s", "phys.size.radius");
@@ -452,7 +452,7 @@ Json_write(char *filename)
         json_object_array_add(field_row, o);
 
         if (prefs.match_flag) {
-            o = new_json_object("DPixelScale", "float", "None", "instr.scale;instr.pixel;arith.ratio");
+            o = new_json_object("DPixelScale", "float", NULL, "instr.scale;instr.pixel;arith.ratio");
             json_object_object_add(o, "value", json_object_new_double(field->match_dscale));
             json_object_array_add(field_row, o);
 
@@ -460,7 +460,7 @@ Json_write(char *filename)
             json_object_object_add(o, "value", json_object_new_double(field->match_dangle));
             json_object_array_add(field_row, o);
 
-            o = new_json_object("AS_Contrast", "float", "None", "stat.correlation;arith.ratio");
+            o = new_json_object("AS_Contrast", "float", NULL, "stat.correlation;arith.ratio");
             json_object_object_add(o, "value", json_object_new_double(field->match_asig));
             json_object_array_add(field_row, o);
 
@@ -472,11 +472,11 @@ Json_write(char *filename)
             json_object_object_add(o, "value", json_object_new_double(field->match_dlat));
             json_object_array_add(field_row, o);
 
-            o = new_json_object("XY_Contrast", "float", "None", "stat.correlation;arith.ratio");
+            o = new_json_object("XY_Contrast", "float", NULL, "stat.correlation;arith.ratio");
             json_object_object_add(o, "value", json_object_new_double(field->match_sig));
             json_object_array_add(field_row, o);
 
-            o = new_json_object("Shear", "float", "None", "phys.size.axisRatio;obs.image");
+            o = new_json_object("Shear", "float", NULL, "phys.size.axisRatio;obs.image");
             json_object_object_add(o, "value", json_object_new_double(field->match_shear));
             json_object_array_add(field_row, o);
 
@@ -485,76 +485,79 @@ Json_write(char *filename)
             json_object_array_add(field_row, o);
         }
 
-        o = new_json_object("Chi2_Internal", "float", "None", "stat.fit.chi2");
+        o = new_json_object("Chi2_Internal", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(field->chi2_int));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NDeg_Internal", "int", "None", "stat.fit.dof");
+        o = new_json_object("NDeg_Internal", "int", NULL, "stat.fit.dof");
         json_object_object_add(o, "value", json_object_new_int(field->nchi2_int));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Chi2_Internal_HighSN", "float", "None", "stat.fit.chi2");
+        o = new_json_object("Chi2_Internal_HighSN", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(field->chi2_int_hsn));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NDeg_Internal_HighSN", "int", "None", "stat.fit.dof");
+        o = new_json_object("NDeg_Internal_HighSN", "int", NULL, "stat.fit.dof");
         json_object_object_add(o, "value", json_object_new_int(field->nchi2_int_hsn));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromOffset_Reference", "float", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromOffset_Reference", "float array", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
+        p = json_object_new_array();
         for (j=0; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->offset_ref[j] * deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->offset_ref[j] * deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromSigma_Reference", "float", "%s", "stat.stdev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Reference", "float array", "%s", "stat.stdev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->sig_referr[j] * deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->sig_referr[j] * deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromCorr_Reference", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Reference", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double(field->sig_corr_ref));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Chi2_Reference", "float", "None", "stat.fit.chi2");
+        o = new_json_object("Chi2_Reference", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(field->chi2_ref));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NDeg_Reference", "int", "None", "stat.fit.dof");
+        o = new_json_object("NDeg_Reference", "int", NULL, "stat.fit.dof");
         json_object_object_add(o, "value", json_object_new_int(field->nchi2_ref));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromOffset_Reference_HighSN", "float", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromOffset_Reference_HighSN", "float array", "%s", "pos.eq.ra;pos.eq.dec;arith.diff;obs.field");
+        p = json_object_new_array();
         for (j=0; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->offset_ref_hsn[j] * deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->offset_ref_hsn[j] * deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromSigma_Reference_HighSN", "float", "%s", "stat.stdev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Reference_HighSN", "float array", "%s", "stat.stdev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<field->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", (double) field->sig_referr_hsn[j] * deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(field->sig_referr_hsn[j] * deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AstromCorr_Reference_HighSN", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Reference_HighSN", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double((double)field->sig_corr_ref_hsn));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("Chi2_Reference_HighSN", "float", "None", "stat.fit.chi2");
+        o = new_json_object("Chi2_Reference_HighSN", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(field->chi2_ref_hsn));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("NDeg_Reference_HighSN", "int", "None", "stat.fit.dof");
+        o = new_json_object("NDeg_Reference_HighSN", "int", NULL, "stat.fit.dof");
         json_object_object_add(o, "value", json_object_new_int(field->nchi2_ref_hsn));
         json_object_array_add(field_row, o);
 
         o = json_object_new_object();
-        json_object_array_add(field_array, field_row);
+        item = json_object_new_object();
+        json_object_object_add(item, "FieldItem", field_row);
+
+        json_object_array_add(field_array, item);
     }
 
     json_object_object_add(main_obj, "Fields", field_array);
@@ -588,247 +591,249 @@ Json_write(char *filename)
         json_object *fgroup_row = json_object_new_array();
         json_object *o;
 
-        o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
+        o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
         snprintf(strbuff, MAXCHAR, "G%d", i+1);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Index", "int", "None", "meta.record;meta.dataset");
+        o = new_json_object("Index", "int", NULL, "meta.record;meta.dataset");
         json_object_object_add(o, "value", json_object_new_double(i+1));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("NFields", "int", "None", "meta.number;meta.dataset");
+        o = new_json_object("NFields", "int", NULL, "meta.number;meta.dataset");
         json_object_object_add(o, "value", json_object_new_double(fgroup->nfield));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("NAxis", "int", "None", "pos.wcs.naxis");
+        o = new_json_object("NAxis", "int", NULL, "pos.wcs.naxis");
         json_object_object_add(o, "value", json_object_new_double(fgroup->naxis));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Lng_Axis", "int", "None", "meta.id;pos.eq.ra");
+        o = new_json_object("Lng_Axis", "int", NULL, "meta.id;pos.eq.ra");
         json_object_object_add(o, "value", json_object_new_double(fgroup->lng));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Lat_Axis", "int", "None", "meta.id;pos.eq.de");
+        o = new_json_object("Lat_Axis", "int", NULL, "meta.id;pos.eq.de");
         json_object_object_add(o, "value", json_object_new_double(fgroup->lat));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Field_Coordinates", "double", "None", "pos.eq.ra;pos.eq.dec;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("Field_Coordinates", "double array", NULL, "pos.eq.ra;pos.eq.dec;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.10g ", fgroup->meanwcspos[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->meanwcspos[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Pixel_Scale", "float", "None", "instr.pixel;obs.field;stat.mean");
-        strbuffpos = 0;
+        o = new_json_object("Pixel_Scale", "float array", NULL, "instr.pixel;obs.field;stat.mean");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.10g ", fgroup->meanwcsscale[j]*deg2arcmin);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->meanwcsscale[j]*deg2arcmin));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("Max_Radius", "float", "None", "phys.size.radius;obs.field");
+        o = new_json_object("Max_Radius", "float", NULL, "phys.size.radius;obs.field");
         json_object_object_add(o, "value", json_object_new_double(fgroup->maxradius*deg2arcmin));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstRef_Catalog", "char", "None", "meta.id;meta.dataset");
+        o = new_json_object("AstRef_Catalog", "string", NULL, "meta.id;meta.dataset");
         json_object_object_add(o, "value", json_object_new_string(astrefcats[(int)prefs.astrefcat].name));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstRef_Band", "char", "None", "instr.bandpass");
+        o = new_json_object("AstRef_Band", "string", NULL, "instr.bandpass");
         json_object_object_add(o, "value", json_object_new_string(
             astrefcats[(int)prefs.astrefcat].bandname ? astrefcats[(int)prefs.astrefcat].bandname : "" ));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromSigma_Internal", "float", "None", "stat.stdev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Internal", "float array", NULL, "stat.stdev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_interr[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_interr[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromCorr_Internal", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Internal", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double(fgroup->sig_corr_int));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromChi2_Internal", "float", "None", "stat.fit.chi2");
+        o = new_json_object("AstromChi2_Internal", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(fgroup->chi2_int));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromNDets_Internal", "int", "None", "meta.number;src");
+        o = new_json_object("AstromNDets_Internal", "int", NULL, "meta.number;src");
         json_object_object_add(o, "value", json_object_new_double(fgroup->nintmatch));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromSigma_Internal_HighSN", "float", "None", "stat.stdev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Internal_HighSN", "float array", NULL, "stat.stdev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_interr_hsn[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_interr_hsn[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromCorr_Internal_HighSN", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Internal_HighSN", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double(fgroup->sig_corr_int_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromChi2_Internal_HighSN", "float", "None", "stat.fit.chi2");
+        o = new_json_object("AstromChi2_Internal_HighSN", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(fgroup->chi2_int_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromNDets_Internal_HighSN", "int", "None", "meta.number;src");
+        o = new_json_object("AstromNDets_Internal_HighSN", "int", NULL, "meta.number;src");
         json_object_object_add(o, "value", json_object_new_double(fgroup->nintmatch_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromOffset_Reference", "float", "None", "arith.diff;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromOffset_Reference", "float array", NULL, "arith.diff;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->offset_ref[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->offset_ref[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromSigma_Reference", "float", "None", "stat.stdev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Reference", "float array", NULL, "stat.stdev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_referr[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_referr[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromCorr_Reference", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Reference", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double(fgroup->sig_corr_ref));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromChi2_Reference", "float", "None", "stat.fit.chi2");
+        o = new_json_object("AstromChi2_Reference", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(fgroup->chi2_ref));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromNDets_Reference", "int", "None", "meta.number;src");
+        o = new_json_object("AstromNDets_Reference", "int", NULL, "meta.number;src");
         json_object_object_add(o, "value", json_object_new_int(fgroup->nrefmatch));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromOffset_Reference_HighSN", "float", "None", "arith.diff;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromOffset_Reference_HighSN", "float array", NULL, "arith.diff;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->offset_ref_hsn[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->offset_ref_hsn[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromSigma_Reference_HighSN", "float", "None", "stat.stDev;pos.eq;obs.field");
-        strbuffpos = 0;
+        o = new_json_object("AstromSigma_Reference_HighSN", "float array", NULL, "stat.stDev;pos.eq;obs.field");
+        p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_referr_hsn[j]*deg2arcsec);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_referr_hsn[j]*deg2arcsec));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromCorr_Reference_HighSN", "float", "None", "stat.correlation;pos.eq;obs.field");
+        o = new_json_object("AstromCorr_Reference_HighSN", "float", NULL, "stat.correlation;pos.eq;obs.field");
         json_object_object_add(o, "value", json_object_new_double(fgroup->sig_corr_ref_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromChi2_Reference_HighSN", "float", "None", "stat.fit.chi2");
+        o = new_json_object("AstromChi2_Reference_HighSN", "float", NULL, "stat.fit.chi2");
         json_object_object_add(o, "value", json_object_new_double(fgroup->chi2_ref_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("AstromNDets_Reference_HighSN", "int", "None", "meta.number;src");
+        o = new_json_object("AstromNDets_Reference_HighSN", "int", NULL, "meta.number;src");
         json_object_object_add(o, "value", json_object_new_int(fgroup->nrefmatch_hsn));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("NPhotInstru", "int", "None", "meta.number;meta.em");
+        o = new_json_object("NPhotInstru", "int", NULL, "meta.number;meta.em");
         json_object_object_add(o, "value", json_object_new_int(prefs.nphotinstrustr));
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotInstru_Name", "char", "None", "meta.id;instr.bandpass");
-        for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "P%d,", j+1);
-        strbuff[strlen(strbuff)] = '\0';
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        o = new_json_object("PhotInstru_Name", "string array", NULL, "meta.id;instr.bandpass");
+        p = json_object_new_array();
+        for (j=0; j<prefs.nphotinstrustr; j++) {
+            snprintf(strbuff, MAXCHAR , "P%d", j+1);
+            json_object_array_add(p, json_object_new_string(strbuff));
+        }
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotSigma_Internal", "float", "None", "stat.error;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotSigma_Internal", "float array", NULL, "stat.error;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_intmagerr[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_intmagerr[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotChi2_Internal", "float", "None", "stat.chi2;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotChi2_Internal", "float array", NULL, "stat.chi2;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->chi2_intmag[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->chi2_intmag[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotNDets_Internal", "int", "None", "meta.number;src");
-        strbuffpos = 0;
+        o = new_json_object("PhotNDets_Internal", "int array", NULL, "meta.number;src");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%d ", fgroup->nintmagmatch[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_int(fgroup->nintmagmatch[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotSigma_Internal_HighSN", "float", "None", "stat.error;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotSigma_Internal_HighSN", "float array", NULL, "stat.error;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_intmagerr_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_intmagerr_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotChi2_Internal_HighSN", "float", "None", "stat.chi2;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotChi2_Internal_HighSN", "float array", NULL, "stat.chi2;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->chi2_intmag_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->chi2_intmag_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotNDets_Internal_HighSN", "int", "None", "meta.number;src");
-        strbuffpos = 0;
+        o = new_json_object("PhotNDets_Internal_HighSN", "int array", NULL, "meta.number;src");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%i ", fgroup->nintmagmatch_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_int(fgroup->nintmagmatch_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotSigma_Reference", "float", "None", "stat.error;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotSigma_Reference", "float array", NULL, "stat.error;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_refmagerr[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_refmagerr[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotChi2_Reference", "float", "None", "stat.chi2;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotChi2_Reference", "float array", NULL, "stat.chi2;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->chi2_refmag[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->chi2_refmag[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotNDets_Reference", "int", "None", "meta.number;src");
-        strbuffpos = 0;
+        o = new_json_object("PhotNDets_Reference", "int array", NULL, "meta.number;src");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%d ", fgroup->nrefmagmatch[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->nrefmagmatch[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotSigma_Reference_HighSN", "float", "None", "stat.error;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotSigma_Reference_HighSN", "float array", NULL, "stat.error;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->sig_refmagerr_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->sig_refmagerr_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotChi2_Reference_HighSN", "float", "None", "stat.chi2;phot.mag");
-        strbuffpos = 0;
+        o = new_json_object("PhotChi2_Reference_HighSN", "float array", NULL, "stat.chi2;phot.mag");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%.6g ", fgroup->chi2_refmag_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_double(fgroup->chi2_refmag_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
-        o = new_json_object("PhotNDets_Reference_HighSN", "int", "None", "meta.number;src");
-        strbuffpos = 0;
+        o = new_json_object("PhotNDets_Reference_HighSN", "int array", NULL, "meta.number;src");
+        p = json_object_new_array();
         for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%d ", fgroup->nrefmagmatch_hsn[j]);
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+            json_object_array_add(p, json_object_new_int(fgroup->nrefmagmatch_hsn[j]));
+        json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
 #ifdef HAVE_PLPLOT
         if (pngflag) {
             for (j=pnplot; j<nplot; j++) {
-                o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
+                o = new_json_object(cp_names[j], "string", NULL, "meta.id;meta.dataset");
                 strcpy(plotfilename, prefs.cplot_name[cp[j]]);
                 if (!(pstr = strrchr(plotfilename, '.')))
                     pstr = plotfilename + strlen(plotfilename);
@@ -869,38 +874,40 @@ Json_write(char *filename)
 
         json_object *astr_instru_row = json_object_new_array();
 
-        o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
+        o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
         snprintf(strbuff, MAXCHAR, "A%d", i+1);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(astr_instru_row, o);
 
-        o = new_json_object("Index", "int", "None", "meta.record;meta.dataset");
+        o = new_json_object("Index", "int", NULL, "meta.record;meta.dataset");
         json_object_object_add(o, "value", json_object_new_int(i+1));
         json_object_array_add(astr_instru_row, o);
 
-        o = new_json_object("NFields", "int", "None", "meta.number;meta.dataset");
+        o = new_json_object("NFields", "int", NULL, "meta.number;meta.dataset");
         json_object_object_add(o, "value", json_object_new_int(f2));
         json_object_array_add(astr_instru_row, o);
 
-        o = new_json_object("MagZeroPoint_Output", "float", "None", "astr.mag;astr.calib;arith.zp");
+        o = new_json_object("MagZeroPoint_Output", "float", NULL, "astr.mag;astr.calib;arith.zp");
         json_object_object_add(o, "value", json_object_new_double(prefs.nastrinstruext[i]));
         json_object_array_add(astr_instru_row, o);
 
-        o = new_json_object("NKeys", "int", "None", "meta.number");
+        o = new_json_object("NKeys", "int", NULL, "meta.number");
         json_object_object_add(o, "value", json_object_new_int(len));
         json_object_array_add(astr_instru_row, o);
 
-        o = new_json_object("Keys", "char", "None", "meta.note");
-        strbuffpos = 0;
-        for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%32.32s ", prefs.astrinstrustr[i] + (j*80));
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        o = new_json_object("Keys", "string array", NULL, "meta.note");
+        p = json_object_new_array();
+        for (j=0; j<prefs.nphotinstrustr; j++) {
+            snprintf(strbuff, MAXCHAR, "%32.32s ", prefs.astrinstrustr[i] + (j*80));
+            json_object_array_add(p, json_object_new_string(strbuff));
+        }
+        json_object_object_add(o, "value", p);
         json_object_array_add(astr_instru_row, o);
 
 #ifdef HAVE_PLPLOT
         if (pngflag) {
             for (j=pnplot; j<nplot; j++) {
-                o = new_json_object(cp_names[j], "char", "None", "meta.id;meta.dataset");
+                o = new_json_object(cp_names[j], "string", NULL, "meta.id;meta.dataset");
                 strcpy(plotfilename, prefs.cplot_name[cp[j]]);
                 if (!(pstr = strrchr(plotfilename, '.')))
                     pstr = plotfilename + strlen(plotfilename);
@@ -912,11 +919,13 @@ Json_write(char *filename)
         }
 #endif /* HAVE_PLPLOT */
 
-        json_object_array_add(astr_instru_array, astr_instru_row);
+        item = json_object_new_object();
+        json_object_object_add(item, "AstroInstrumentItem", astr_instru_row);
+        json_object_array_add(astr_instru_array, item);
 
     }
 
-    json_object_object_add(main_obj, "AstroInstru", astr_instru_array);
+    json_object_object_add(main_obj, "AstroInstruments", astr_instru_array);
 
 
 
@@ -936,66 +945,72 @@ Json_write(char *filename)
 
         json_object *phot_instru_row = json_object_new_array();
 
-        o = new_json_object("Name", "char", "None", "meta.id;meta.dataset");
+        o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
         snprintf(strbuff, MAXCHAR, "P%d", i+1);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(phot_instru_row, o);
 
-        o = new_json_object("Index", "int", "None", "meta.record;meta.dataset");
+        o = new_json_object("Index", "int", NULL, "meta.record;meta.dataset");
         json_object_object_add(o, "value", json_object_new_int(i+1));
         json_object_array_add(phot_instru_row, o);
 
-        o = new_json_object("NFields", "int", "None", "meta.number;meta.dataset");
+        o = new_json_object("NFields", "int", NULL, "meta.number;meta.dataset");
         json_object_object_add(o, "value", json_object_new_int(f2));
         json_object_array_add(phot_instru_row, o);
 
-        o = new_json_object("MagZeroPoint_Output", "float", "None", "phot.mag;phot.calib;arith.zp");
+        o = new_json_object("MagZeroPoint_Output", "float", NULL, "phot.mag;phot.calib;arith.zp");
         json_object_object_add(o, "value", json_object_new_double(prefs.magzero_out[i]));
         json_object_array_add(phot_instru_row, o);
 
-        o = new_json_object("NKeys", "int", "None", "meta.number");
+        o = new_json_object("NKeys", "int", NULL, "meta.number");
         json_object_object_add(o, "value", json_object_new_int(len));
         json_object_array_add(phot_instru_row, o);
 
-        o = new_json_object("Keys", "char", "None", "meta.note");
-        strbuffpos = 0;
-        for (j=0; j<prefs.nphotinstrustr; j++)
-            snprintf(&strbuff[strbuffpos], MAXCHAR - strbuffpos, "%32.32s ", prefs.photinstrustr[i] + (j*80));
-        json_object_object_add(o, "value", json_object_new_string(strbuff));
+        o = new_json_object("Keys", "string array", NULL, "meta.note");
+        p = json_object_new_array();
+        for (j=0; j<prefs.nphotinstrustr; j++) {
+            snprintf(strbuff, MAXCHAR, "%32.32s ", prefs.photinstrustr[i] + (j*80));
+            json_object_array_add(p, json_object_new_string(strbuff));
+        }
+        json_object_object_add(o, "value", p);
         json_object_array_add(phot_instru_row, o);
 
-        json_object_array_add(phot_instru_array, phot_instru_row);
+        item = json_object_new_object();
+        json_object_object_add(item, "PhotoInstrumentItem", phot_instru_row);
+        json_object_array_add(phot_instru_array, item);
 
     }
 
-    json_object_object_add(main_obj, "PhotInstru", phot_instru_array);
+    json_object_object_add(main_obj, "PhotInstruments", phot_instru_array);
 
     /* warnings */
-    
+
     json_object *warn_array = json_object_new_array();
     char *warnstr;
     for (warnstr = warning_history(), i=0; *warnstr; warnstr = warning_history(), i++) {
         json_object *warn_row = json_object_new_array();
 
-        o = new_json_object("Date", "char", "None", "meta;time.end");
+        o = new_json_object("Date", "string", NULL, "meta;time.end");
         strncpy(strbuff, &warnstr[0], 10);
         strbuff[10] = '\0';
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_row, o);
 
-        o = new_json_object("Time", "char", "None", "meta;time.end");
+        o = new_json_object("Time", "string", NULL, "meta;time.end");
         strncpy(strbuff, &warnstr[11], 8);
         strbuff[8] = '\0';
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_row, o);
 
-        o = new_json_object("Text", "char", "None", "meta");
+        o = new_json_object("Text", "string", NULL, "meta");
         strncpy(strbuff, &warnstr[22], MAXCHAR);
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_row, o);
 
-        json_object_array_add(warn_array, warn_row);
-        
+        item = json_object_new_object();
+        json_object_object_add(item, "WarningItem", warn_row);
+        json_object_array_add(warn_array, item);
+
     }
 
     json_object_object_add(main_obj, "Warnings", warn_array);
@@ -1012,74 +1027,70 @@ Json_write(char *filename)
     /* config file */
     json_object *conf_array = json_object_new_array();
     int cpos;
-    for (i=0; key[i].name[0]; i++) {                                               
+    for (i=0; key[i].name[0]; i++) {
         o = json_object_new_object();
+        char strtype[30];
         json_object *val;
-        switch (key[i].type) {                                                     
-            case P_FLOAT:                                                          
+        switch (key[i].type) {
+            case P_FLOAT:
+                strcpy(strtype, "float");
                 val = json_object_new_double(*((float*)key[i].ptr));
-                break;                                                             
-            case P_INT:                                                            
+                break;
+            case P_INT:
+                strcpy(strtype, "int");
                 val = json_object_new_int(*((int*)key[i].ptr));
-                break;                                                             
-            case P_BOOL:                                                           
-                sprintf(strbuff, "%c", *((int*)key[i].ptr) ? 'T' : 'F');
-                val = json_object_new_int(*((int*)key[i].ptr));
-                break;                                                             
-            case P_STRING:                                                         
+                break;
+            case P_BOOL:
+                strcpy(strtype, "boolean");
+                val = json_object_new_boolean(*((int*)key[i].ptr));
+                break;
+            case P_STRING:
+                strcpy(strtype, "string");
                 val = json_object_new_string(((char*)key[i].ptr));
-                break;                                                             
-            case P_KEY:                                                            
+                break;
+            case P_KEY:
+                strcpy(strtype, "string");
                 val = json_object_new_string(key[i].keylist[*((int*)key[i].ptr)]);
-                break;                                                             
-            case P_FLOATLIST:                                                      
-                cpos = 0;                                                          
-                for (j=0; j< *(key[i].nlistptr); j++)                              
-                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%f, ",          
-                                ((double*)key[i].ptr)[j]);                         
-                strbuff[cpos-2] = '\0';                                               
-                val = json_object_new_string(strbuff);
-                break;                                                             
-            case P_INTLIST:                                                        
-                cpos = 0;                                                          
-                for (j=0; j< *(key[i].nlistptr); j++)                              
-                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%i, ",          
-                                ((int*)key[i].ptr)[j]);                            
-                strbuff[cpos-2] = '\0';                                               
-                val = json_object_new_string(strbuff);
-                break;                                                             
-            case P_BOOLLIST:                                                       
-                cpos = 0;                                                          
-                for (j=0; j< *(key[i].nlistptr); j++)                              
-                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%c, ",          
-                                ((int*)key[i].ptr)[j] ? 'T' : 'F');                
-                strbuff[cpos-2] = '\0';                                               
-                val = json_object_new_string(strbuff);
-                break;                                                             
-            case P_STRINGLIST:                                                     
-                cpos = 0;                                                          
-                for (j=0; j< *(key[i].nlistptr); j++)                              
-                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%s, ",          
-                                ((char**)key[i].ptr)[j]);                          
-                strbuff[cpos-2] = '\0';                                               
-                val = json_object_new_string(strbuff);
-                break;                                                             
-            case P_KEYLIST:                                                        
-                cpos = 0;                                                          
-                for (j=0; j< *(key[i].nlistptr); j++)                              
-                    cpos += snprintf(&strbuff[cpos], MAXCHAR - cpos, "%s, ",          
-                                key[i].keylist[((int*)key[i].ptr)[j]]);            
-                strbuff[cpos-2] = '\0';                                               
-                val = json_object_new_string(strbuff);
-                break;                                                             
+                break;
+            case P_FLOATLIST:
+                strcpy(strtype, "float array");
+                val = json_object_new_array();
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    json_object_array_add(val, json_object_new_double(((double*)key[i].ptr)[j]));
+                break;
+            case P_INTLIST:
+                strcpy(strtype, "int array");
+                val = json_object_new_array();
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    json_object_array_add(val, json_object_new_int(((int*)key[i].ptr)[j]));
+                break;
+            case P_BOOLLIST:
+                strcpy(strtype, "boolean array");
+                val = json_object_new_array();
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    json_object_array_add(val, json_object_new_boolean(((int*)key[i].ptr)[j]));
+                break;
+            case P_STRINGLIST:
+                strcpy(strtype, "string array");
+                val = json_object_new_array();
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    json_object_array_add(val, json_object_new_string(((char**)key[i].ptr)[j]));
+                break;
+            case P_KEYLIST:
+                strcpy(strtype, "string array");
+                val = json_object_new_array();
+                for (j=0; j< *(key[i].nlistptr); j++)
+                    json_object_array_add(val, json_object_new_string(key[i].keylist[((int*)key[i].ptr)[j]]));
+                break;
         }
 
+        json_object_object_add(o, "type", json_object_new_string(strtype));
         json_object_object_add(o, "key", json_object_new_string(key[i].name));
         json_object_object_add(o, "value", val);
         json_object_array_add(conf_array, o);
-                                                                                   
-    }   
-    json_object_object_add(tables, "Configuration", conf_array);
+
+    }
+    json_object_object_add(main_obj, "Configuration", conf_array);
 
 
     char *output = (char*) json_object_to_json_string(main_obj);
