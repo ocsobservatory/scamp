@@ -844,7 +844,10 @@ Json_write(char *filename)
             }
         }
 #endif /* HAVE_PLPLOT */
-        json_object_array_add(fgroup_array, fgroup_row);
+
+        item = json_object_new_object();
+        json_object_object_add(item, "FgroupItem", fgroup_row);
+        json_object_array_add(fgroup_array, item);
 
     }
 
