@@ -39,7 +39,6 @@
 #include "dgeomap.h"
 #include "fgroup.h"
 #include "match.h"
-#include "xml.h"
 
 #ifdef	USE_THREADS
 #define	THREADS_PREFMAX THREADS_NMAX
@@ -200,8 +199,8 @@ pkeystruct key[] =
   {"WRITE_HTML", P_BOOL, &prefs.html_flag},
   {"HTML_NAME", P_STRING, prefs.html_name},
   {"HTML_TPL", P_STRING, prefs.html_tpl},
-  {"WRITE_XML", P_BOOL, &prefs.xml_flag},
-  {"XML_NAME", P_STRING, prefs.xml_name},
+  {"WRITE_JSON", P_BOOL, &prefs.json_flag},
+  {"JSON_NAME", P_STRING, prefs.json_name},
   {""}
  };
 
@@ -367,10 +366,10 @@ char *default_prefs[] =
 "#------------------------------ Miscellaneous ---------------------------------",
 " ",
 "VERBOSE_TYPE           NORMAL          # QUIET, NORMAL, LOG or FULL",
-"WRITE_XML              Y               # Write XML file (Y/N)?",
-"XML_NAME               scamp.xml       # Filename for XML output",
+"WRITE_JSON             Y               # Write JSON file (Y/N)?",
+"JSON_NAME              scamp.json      # Filename for JSON output",
 "WRITE_HTML             Y               # Write HTML report file (Y/N)?",
-"HTML_NAME              scamp_report.html # Filename for HTML output",
+"HTML_NAME              scamp.html      # Filename for HTML output",
 "*HTML_TPL               " HTML_TPL, 
 "*                                       # template file name for HTML output",
 #ifdef USE_THREADS

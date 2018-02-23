@@ -1,14 +1,15 @@
 /* write html report utilities */
-#ifndef _JSON_H_
-#define _JSON_H_
+#ifndef _JSONOUT_H_
+#define _JSONOUT_H_
 
 #include "fgroup.h"
 #include "field.h"
 #include <json.h>
 
 /* not thread safe */
-void Json_set_data(fieldstruct**,int,fgroupstruct**,int);
-json_object *Json_write(char *filename);
-void Json_free(json_object *obj);
+void JsonOut_set_data(fieldstruct**,int,fgroupstruct**,int);
+json_object *JsonOut_generate();
+void JsonOut_write(char *filename, json_object *js);
+void JsonOut_free(json_object *obj);
 
-#endif /* _JSON_H_ */
+#endif /* _JSONOUT_H_ */

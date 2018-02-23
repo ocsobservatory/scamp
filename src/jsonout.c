@@ -19,7 +19,7 @@ static int json_nfields;
 static int json_nfgroups;
 
 void
-Json_set_data(
+JsonOut_set_data(
         fieldstruct  **fields,
         int          nfields,
         fgroupstruct **fgroups,
@@ -231,7 +231,7 @@ get_next_fgroup_plot(char**name) {
 #endif /* HAVE_PLPLOT */
 
 json_object*
-Json_write(char *filename)
+JsonOut_generate()
 {
     json_object *main_obj = json_object_new_object();
     json_object *tables = json_object_new_object();
@@ -1095,20 +1095,25 @@ Json_write(char *filename)
     }
     json_object_object_add(main_obj, "Configuration", conf_array);
 
+    return main_obj;
+}
 
-    char *output = (char*) json_object_to_json_string(main_obj);
+void
+JsonOut_write(char *filename, json_object *js)
+{
 
     FILE *fd = fopen(filename, "w");
     if (!fd) {
         perror(filename);
     } else {
+        char *output = (char*) json_object_to_json_string(js);
         fwrite(output, 1, strlen(output), fd);
         fclose(fd);
     }
-    return main_obj;
+
 }
 
 void
-Json_free(json_object *obj) {
+JsonOut_free(json_object *obj) {
     json_object_put(obj); /* What the fuck */
 }

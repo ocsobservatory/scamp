@@ -220,8 +220,8 @@ typedef struct
   int		html_flag;			/* Write HTML report file? */
   char		html_name[MAXCHAR];	/* HTML report file name */
   char		html_tpl[MAXCHAR];	/* HTML template file name */
-  int		xml_flag;			/* Write XML file? */
-  char		xml_name[MAXCHAR];		/* XML file name */
+  int		json_flag;			/* Write JSON file? */
+  char		json_name[MAXCHAR];		/* JSON file name */
   char		sdate_start[12];		/* SCAMP start date */
   char		stime_start[12];		/* SCAMP start time */
   char		sdate_end[12];			/* SCAMP end date */

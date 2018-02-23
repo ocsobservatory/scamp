@@ -64,9 +64,8 @@
 #include "threads.h"
 #endif
 #include "wcs/wcs.h"
-#include "xml.h"
 #include "jsonout.h"
-#include "html.h"
+#include "htmlout.h"
 
 time_t		thetime, thetime2;
 
@@ -83,7 +82,7 @@ void	makeit(void)
     int			i,f,g, nfield, ngroup, nsample, nclip, hh,mm,dd,dm;
 
     /* Install error logging */
-    error_installfunc(write_error);
+    //error_installfunc(write_error);
 
     /* Processing start date and time */
     thetime = time(NULL);
@@ -117,12 +116,18 @@ void	makeit(void)
                 tm->tm_hour, tm->tm_min, tm->tm_sec);
         prefs.time_diff = difftime(thetime2, thetime);
 
-        /*-- Write XML */
-        if (prefs.xml_flag)
+        /*-- Write JSON */
+        if (prefs.json_flag || prefs.html_flag)
         {
-            init_xml(NULL, 0, NULL, 0);
-            write_xml(prefs.xml_name);
-            end_xml();
+            JsonOut_set_data(NULL, 0, NULL, 0);
+            json_object *js = JsonOut_generate();
+
+            if (prefs.json_flag)
+                JsonOut_write(prefs.json_name, js);
+            if (prefs.html_flag)
+                HtmlOut_write(prefs.html_name, js);
+
+            JsonOut_free(js);
         }
         return;
     }
@@ -586,8 +591,7 @@ void	makeit(void)
         cplot_adprophisto2d(fgroups[g], prefs.sn_thresh[1]);
 #endif
 
-    init_xml(fields, nfield, fgroups, ngroup);
-    Json_set_data(fields, nfield, fgroups, ngroup);
+    JsonOut_set_data(fields, nfield, fgroups, ngroup);
 
     /* Processing end date and time */
     thetime2 = time(NULL);
@@ -655,16 +659,14 @@ void	makeit(void)
         }
     }
 
-    /* Write XML */
-    if (prefs.xml_flag) {
-        write_xml(prefs.xml_name);
-        end_xml();
-    }
-
-    if (prefs.html_flag) {
-        json_object *obj = Json_write(prefs.html_name);
-        //Html_write(prefs.html_name);
-        Json_free(obj);
+    /* Write JSON/HTML */
+    if (prefs.json_flag || prefs.html_flag) {
+        json_object *js = JsonOut_generate();
+        if (prefs.html_flag)
+            HtmlOut_write(prefs.html_name, js);
+        if (prefs.json_flag)
+            JsonOut_write(prefs.json_name, js);
+        JsonOut_free(js);
     }
 
     /* Clean-up stuff */
@@ -700,6 +702,7 @@ void	makeit(void)
   AUTHOR	E. Bertin (IAP)
   VERSION	02/10/2006
  ***/
+/*
 void    write_error(char *msg1, char *msg2)
 {
     char		error[MAXCHAR];
@@ -711,5 +714,6 @@ void    write_error(char *msg1, char *msg2)
 
     return;
 }
+*/
 
 
