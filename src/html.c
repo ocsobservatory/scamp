@@ -34,7 +34,7 @@ Html_set_data(
 }
 
 void
-Html_write(char *filename)
+Html_write2(char *filename)
 {
     int i, j, k;
     char buff[MAXCHAR];

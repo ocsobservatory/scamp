@@ -656,12 +656,16 @@ void	makeit(void)
     }
 
     /* Write XML */
-    if (prefs.xml_flag)
+    if (prefs.xml_flag) {
         write_xml(prefs.xml_name);
-    end_xml();
+        end_xml();
+    }
 
-    if (prefs.html_flag)
-        Json_write(prefs.html_name);
+    if (prefs.html_flag) {
+        json_object *obj = Json_write(prefs.html_name);
+        //Html_write(prefs.html_name);
+        Json_free(obj);
+    }
 
     /* Clean-up stuff */
     NFPRINTF(OUTPUT, "Cleaning up...");

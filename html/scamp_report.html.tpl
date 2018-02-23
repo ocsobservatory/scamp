@@ -6,6 +6,7 @@
 	<body>
 
 		<h1>Processing summary</h1>
+        <p>{{CommandLine}}</p>
 
 		{{?table_summary}}
 		<h2>Summary Table on Input Files</h2>
