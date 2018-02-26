@@ -34,73 +34,141 @@ HtmlOut_set_data(
 }
 
 void
-HtmlOut_write(char *filename, json_object *main) 
+build_astr_instrument_table(json_object *main, Dict *dict)
 {
 	json_object *table, *key, *val, *item, *elem, *elem2;
-	Template *template;
-	char *strkey, *output;
-    	char buff[MAXCHAR];
-    	Dict *dict, *sub;
-	FILE *fd;
+	char buff[MAXCHAR], *strkey;
+	Dict *sub;
 	int i, j, k, tlen, ilen, olen, ccount;
 
-    	dict = Mstc_dict_new();
-	if (json_object_object_get_ex(main, "AstroInstruments", &table)) {
+	if (json_object_object_get_ex(main, "AstroInstruments", &table) == 0)
+		return;
 
-		tlen  = json_object_array_length(table);
-		for (i=0; i<tlen; i++) {
-			item = json_object_array_get_idx(table, i);
-			sub = Mstc_dict_addSectionItem(dict, "AstroInstruments");
-				
-			ilen = json_object_array_length(item);
-			for (j=0; j<ilen; j++) {
-				elem = json_object_array_get_idx(item, j);
+	tlen  = json_object_array_length(table);
+	for (i=0; i<tlen; i++) {
+		item = json_object_array_get_idx(table, i);
+		sub = Mstc_dict_addSectionItem(dict, "AstroInstruments");
 
-				json_object_object_get_ex(elem, "name", &key);
-				if (key == NULL) continue;
+		ilen = json_object_array_length(item);
+		for (j=0; j<ilen; j++) {
+			elem = json_object_array_get_idx(item, j);
 
-				json_object_object_get_ex(elem, "value", &val);
-				strkey = (char*) json_object_get_string(key);
+			json_object_object_get_ex(elem, "name", &key);
+			if (key == NULL) continue;
 
-				if (strcmp(strkey, "Name") == 0) {
+			json_object_object_get_ex(elem, "value", &val);
+			strkey = (char*) json_object_get_string(key);
 
-					Mstc_dict_setValue(sub, "Name", json_object_get_string(val));
+			if (strcmp(strkey, "Name") == 0) {
+				Mstc_dict_setValue(sub, "Name", 
+				    json_object_get_string(val));
+				continue;
+			} 
 
-				} else if (strcmp(strkey, "Index") == 0) {
+			if (strcmp(strkey, "Index") == 0) {
+				Mstc_dict_setFValue(sub, "Index", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
 
-					Mstc_dict_setFValue(sub, "Index", "%i", json_object_get_int(val));
+			if (strcmp(strkey, "NFields") == 0) {
+				Mstc_dict_setFValue(sub, "NFields", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
 
-				} else if (strcmp(strkey, "NFields") == 0) {
+			if (strcmp(strkey, "MagZeroPoint_Output") == 0) {
+				Mstc_dict_setFValue(sub, 
+				    "MagZeroPoint_Output", "%lf", 
+				    json_object_get_double(val));
+				continue;
+			} 
 
-					Mstc_dict_setFValue(sub, "NFields", "%i", json_object_get_int(val));
+			if (strcmp(strkey, "NKeys") == 0) {
+				Mstc_dict_setFValue(sub, "NKeys", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
 
-				} else if (strcmp(strkey, "MagZeroPoint_Output") == 0) {
-
-					Mstc_dict_setFValue(sub, "MagZeroPoint_Output", "%lf", json_object_get_double(val));
-
-				} else if (strcmp(strkey, "NKeys") == 0) {
-
-					Mstc_dict_setFValue(sub, "NKeys", "%i", json_object_get_int(val));
-
-				} else if (strcmp(strkey, "Keys") == 0) {
-					olen = json_object_array_length(val);
-					ccount = 0;
-					for (k=0; k<olen; k++) {
-						elem2 = json_object_array_get_idx(val, k);
-						ccount += snprintf(&buff[ccount], MAXCHAR - ccount, "%s, ", json_object_get_string(elem2));
-					}
-					buff[ccount-2] = '\0';
-					
-					Mstc_dict_setValue(sub, "Keys", buff);
-
-				} else if (strcmp(strkey, "DistPlot") == 0) {
-
-					Mstc_dict_setValue(sub, "DistPlot", json_object_get_string(val));
-
+			if (strcmp(strkey, "Keys") == 0) {
+				olen = json_object_array_length(val);
+				ccount = 0;
+				for (k=0; k<olen; k++) {
+					elem2 = 
+					    json_object_array_get_idx(val, k);
+					ccount += snprintf(
+					    &buff[ccount], 
+					    MAXCHAR - ccount, "%s, ", 
+					    json_object_get_string(elem2));
 				}
-			}
+				buff[ccount-2] = '\0';
+
+				Mstc_dict_setValue(sub, "Keys", buff);
+				continue;
+			} 
+
+			if (strcmp(strkey, "DistPlot") == 0)
+				Mstc_dict_setValue(sub, "DistPlot", 
+				    json_object_get_string(val));
 		}
 	}
+}
+
+void
+build_phot_instrument_table(json_object *main, Dict *dict)
+{
+}
+
+void
+build_fields_table(json_object *main, Dict *dict)
+{
+}
+
+void
+build_groups_table(json_object *main, Dict *dict)
+{
+}
+
+void
+build_summary_table(json_object *main, Dict *dict)
+{
+}
+
+void
+build_config_table(json_object *main, Dict *dict)
+{
+}
+
+void
+build_command_line(json_object *main, Dict *dict)
+{
+}
+
+void
+build_warnings_table(json_object *main, Dict *dict)
+{
+}
+
+
+
+void
+HtmlOut_write(char *filename, json_object *main) 
+{
+	Template *template;
+	char *output;
+	Dict *dict;
+	FILE *fd;
+
+    	dict = Mstc_dict_new();
+
+	build_astr_instrument_table(main, dict);
+	build_phot_instrument_table(main, dict);
+	build_fields_table(main, dict);
+	build_groups_table(main, dict);
+	build_summary_table(main, dict);
+	build_config_table(main, dict);
+	build_command_line(main, dict);
+	build_warnings_table(main, dict);
 
 	fd = fopen(filename, "w");
 	if (!fd) {
@@ -108,7 +176,6 @@ HtmlOut_write(char *filename, json_object *main)
 	} else {
 		template = Mstc_template_open("html/scamp_report.html.tpl");
 		output = Mstc_expand(template, dict);
-		Mstc_template_printTokenStructure(template);
 		fwrite(output, 1, strlen(output), fd);
 		fclose(fd);
 	}

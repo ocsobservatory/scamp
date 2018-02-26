@@ -25,7 +25,7 @@
 				<td>{{NFields}}</td>
 				<td>{{NKeys}}</td>
 				<td>{{Keys}}</td>
-				<td>{{DistPlot}}</td>
+				<td><img src="{{DistPlot}}" alt="Distortion plot"></td>
 			</tr>
 			{{/AstroInstruments}}
 		</table>
