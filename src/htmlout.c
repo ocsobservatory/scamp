@@ -34,7 +34,75 @@ HtmlOut_set_data(
 }
 
 void
-HtmlOut_write(char *filename, json_object *obj) {
+HtmlOut_write(char *filename, json_object *main) 
+{
+	json_object *table, *val, *item, *elem;
+	Template *template;
+	FILE *fd;
+	char *strval, *output;
+    	Dict *dict, *sub;
+	int i, j, tlen, ilen;
+
+    	dict = Mstc_dict_new();
+	if (json_object_object_get_ex(main, "AstroInstruments", &table)) {
+
+		tlen  = json_object_array_length(table);
+		for (i=0; i<tlen; i++) {
+			item = json_object_array_get_idx(table, i);
+			sub = Mstc_dict_addSectionItem(dict, "AstroInstruments");
+
+			ilen = json_object_array_length(item);
+			for (j=0; j<ilen; j++) {
+				elem = json_object_array_get_idx(item, j);
+
+				json_object_object_get_ex(elem, "name", &val);
+				if (val == NULL)
+					continue;
+
+				strval = (char*) json_object_get_string(val);
+				if (strcmp(strval, "Name")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "Name", "juju");
+				} else if (strcmp(strval, "Index")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "Index", "juju");
+				} else if (strcmp(strval, "NFields")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "NFields", "juju");
+				} else if (strcmp(strval, "MagZeroPoint_Output")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "MagZeroPoint_Output", "juju");
+				} else if (strcmp(strval, "NKeys")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "NKeys", "juju");
+				} else if (strcmp(strval, "Keys")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "Keys", "juju");
+				} else if (strcmp(strval, "DistPlot")) {
+					printf("have %s\n", strval);
+					Mstc_dict_setValue(sub, "DistPlot", "juju");
+				} else {
+					printf("have %s\n", strval);
+				}
+			}
+		}
+	}
+ 
+
+	fd = fopen(filename, "w");
+	if (!fd) {
+		perror(filename);
+	} else {
+		template = Mstc_template_open("html/scamp_report.html.tpl");
+		output = Mstc_expand(template, dict);
+		fwrite(output, 1, strlen(output), fd);
+		fclose(fd);
+	}
+
+	free(output);
+	Mstc_template_close(template);
+	Mstc_dict_free(dict);
+
 }
 
 void

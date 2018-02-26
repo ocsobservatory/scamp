@@ -553,11 +553,7 @@ JsonOut_generate()
         json_object_object_add(o, "value", json_object_new_int(field->nchi2_ref_hsn));
         json_object_array_add(field_row, o);
 
-        o = json_object_new_object();
-        item = json_object_new_object();
-        json_object_object_add(item, "FieldItem", field_row);
-
-        json_object_array_add(field_array, item);
+        json_object_array_add(field_array, field_row);
     }
 
     json_object_object_add(main_obj, "Fields", field_array);
@@ -845,9 +841,7 @@ JsonOut_generate()
         }
 #endif /* HAVE_PLPLOT */
 
-        item = json_object_new_object();
-        json_object_object_add(item, "FgroupItem", fgroup_row);
-        json_object_array_add(fgroup_array, item);
+        json_object_array_add(fgroup_array, fgroup_row);
 
     }
 
@@ -922,9 +916,7 @@ JsonOut_generate()
         }
 #endif /* HAVE_PLPLOT */
 
-        item = json_object_new_object();
-        json_object_object_add(item, "AstroInstrumentItem", astr_instru_row);
-        json_object_array_add(astr_instru_array, item);
+        json_object_array_add(astr_instru_array, astr_instru_row);
 
     }
 
@@ -978,9 +970,7 @@ JsonOut_generate()
         json_object_object_add(o, "value", p);
         json_object_array_add(phot_instru_row, o);
 
-        item = json_object_new_object();
-        json_object_object_add(item, "PhotoInstrumentItem", phot_instru_row);
-        json_object_array_add(phot_instru_array, item);
+        json_object_array_add(phot_instru_array, phot_instru_row);
 
     }
 
@@ -1010,9 +1000,7 @@ JsonOut_generate()
         json_object_object_add(o, "value", json_object_new_string(strbuff));
         json_object_array_add(warn_row, o);
 
-        item = json_object_new_object();
-        json_object_object_add(item, "WarningItem", warn_row);
-        json_object_array_add(warn_array, item);
+        json_object_array_add(warn_array, warn_row);
 
     }
 
