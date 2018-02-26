@@ -34,6 +34,235 @@ HtmlOut_set_data(
 }
 
 void
+build_fields_table(json_object *main, Dict *dict)
+{
+	json_object *table, *item, *elem, *elem2, *key, *val;
+	double v;
+	Dict *sub;
+	char *strkey, sign;
+	int tlen, ilen, i, j, k;
+
+	int ext_header, photom_flag;
+	ext_header = photom_flag = 0;
+
+	if (json_object_object_get_ex(main, "Fields", &table) == 0)
+		return;
+
+    if (prefs.match_flag)
+        Mstc_dict_setShowSection(dict, "ShowMatch", true);
+
+	tlen  = json_object_array_length(table);
+	for (i=0; i<tlen; i++) {
+		item = json_object_array_get_idx(table, i);
+		sub = Mstc_dict_addSectionItem(dict, "Fields");
+
+    	if (prefs.match_flag)
+        	Mstc_dict_setShowSection(sub, "ShowMatch", true);
+
+		ilen = json_object_array_length(item);
+		for (j=0; j<ilen; j++) {
+			elem = json_object_array_get_idx(item, j);
+
+			json_object_object_get_ex(elem, "name", &key);
+			if (key == NULL) continue;
+
+			json_object_object_get_ex(elem, "value", &val);
+			strkey = (char*) json_object_get_string(key);
+
+			if (strcmp(strkey, "Catalog_Number") == 0) {
+				Mstc_dict_setFValue(sub, "Catalog_Number", "%i",
+				    json_object_get_int(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Catalog_Name") == 0) {
+				Mstc_dict_setFValue(sub, "Catalog_Name", "%s", 
+				    json_object_get_string(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Image_Ident") == 0) {
+				Mstc_dict_setFValue(sub, "Image_Ident", "%s", 
+				    json_object_get_string(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "NExtensions") == 0) {
+				Mstc_dict_setFValue(sub,
+				    "NExtensions", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "NDetect") == 0) {
+				Mstc_dict_setFValue(sub,
+				    "NDetect", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Ext_Header") == 0) {
+				if (json_object_get_boolean(val))
+					ext_header = 1;
+				continue;
+			} 
+
+			if (strcmp(strkey, "Photom_Flag") == 0) {
+				if (json_object_get_boolean(val))
+					photom_flag = 1;
+				Mstc_dict_setFValue(sub, "Flags", "wtf!! %c%c",
+					ext_header  == 1 ? 'H' : '-',
+					photom_flag == 1 ? 'P' : '-');
+				continue;
+			} 
+
+			if (strcmp(strkey, "Group") == 0) {
+				Mstc_dict_setFValue(sub, "Group", "%i", 
+				    json_object_get_int(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Astr_Instrum") == 0) {
+				Mstc_dict_setFValue(sub, "Astr_Instrum", "wtf!!! %s",
+				    json_object_get_string(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Phot_Instrum") == 0) {
+				Mstc_dict_setFValue(sub, "Phot_Instrum", "wtf!!! %s",
+				    json_object_get_string(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Observation_Date") == 0) {
+				Mstc_dict_setFValue(sub, "Observation_Date", "%0.9f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Exposure_Time") == 0) {
+				Mstc_dict_setFValue(sub, "Exposure_Time", "%0.3f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Air_Mass") == 0) {
+				Mstc_dict_setFValue(sub, "Air_Mass", "%0.2f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Field_Coordinates") == 0) {
+				elem2 = json_object_array_get_idx(val, 0);
+				v = json_object_get_double(elem2);
+				Mstc_dict_setFValue(sub, "Right_Ascension", "%0.0f:%.0f:%.2f", 
+					floor(v / 15), 
+					floor(fmod(v*4, 60)) ,
+					floor(fmod(v*240, 60)));
+				elem2 = json_object_array_get_idx(val, 1);
+				v = json_object_get_double(elem2);
+				sign = '+';
+				if (v < 0) {sign = '-'; v = 0 - v;}
+				Mstc_dict_setFValue(sub, "Declination", "%c%.0f:%.0f:%.1f", 
+					sign,
+					floor(v),
+					floor(fmod(v * 60, 60)),
+					floor(fmod(v * 3600, 60)));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Max_Radius") == 0) {
+				Mstc_dict_setFValue(sub, "Max_Radius", "%0.6g'", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Pixel_Scale") == 0) {
+				double a, b;
+				elem2 = json_object_array_get_idx(val, 0);
+				a = json_object_get_double(elem2);
+				elem2 = json_object_array_get_idx(val, 1);
+				b = json_object_get_double(elem2);
+				Mstc_dict_setFValue(sub, "Pixel_Scale", "%0.4g''", 
+				    (a + b) / 2.0);
+				continue;
+			} 
+
+			if (strcmp(strkey, "DPixel_Scale") == 0) {
+				Mstc_dict_setFValue(sub, "DPixel_Scale", "%0.4f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "DPos_Angle") == 0) {
+				Mstc_dict_setFValue(sub, "DPos_Angle", "%0.6g°", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "AS_Contrast") == 0) {
+				Mstc_dict_setFValue(sub, "AS_Contrast", "%0.1f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "DX") == 0) {
+				Mstc_dict_setFValue(sub, "DX", "%0.6g", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "DY") == 0) {
+				Mstc_dict_setFValue(sub, "DY", "%0.6g°", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "XY_Contrast") == 0) {
+				Mstc_dict_setFValue(sub, "XY_Contrast", "%0.1f°", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Chi2_Internal") == 0) {
+				Mstc_dict_setFValue(sub, "Chi2_Internal", "%0.2f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Chi2_Internal_HighSN") == 0) {
+				Mstc_dict_setFValue(sub, "Chi2_Internal_HighSN", "%0.2f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Chi2_Reference") == 0) {
+				Mstc_dict_setFValue(sub, "Chi2_Reference", "%0.2f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Chi2_Reference_HighSN") == 0) {
+				Mstc_dict_setFValue(sub, "Chi2_Reference_HighSN", "%0.2f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "ZeroPoint_Corr") == 0) {
+				Mstc_dict_setFValue(sub, "ZeroPoint_Corr", "%0.3f", 
+				    json_object_get_double(val));
+				continue;
+			} 
+		}
+	}
+}
+
+void
+build_fgroups_table(json_object *main, Dict *dict)
+{
+}
+
+void
 build_astr_instrument_table(json_object *main, Dict *dict)
 {
 	json_object *table, *key, *val, *item, *elem, *elem2;
@@ -120,21 +349,6 @@ build_phot_instrument_table(json_object *main, Dict *dict)
 }
 
 void
-build_fields_table(json_object *main, Dict *dict)
-{
-}
-
-void
-build_groups_table(json_object *main, Dict *dict)
-{
-}
-
-void
-build_summary_table(json_object *main, Dict *dict)
-{
-}
-
-void
 build_config_table(json_object *main, Dict *dict)
 {
 }
@@ -161,11 +375,10 @@ HtmlOut_write(char *filename, json_object *main)
 
     	dict = Mstc_dict_new();
 
+	build_fields_table(main, dict);
+	build_fgroups_table(main, dict);
 	build_astr_instrument_table(main, dict);
 	build_phot_instrument_table(main, dict);
-	build_fields_table(main, dict);
-	build_groups_table(main, dict);
-	build_summary_table(main, dict);
 	build_config_table(main, dict);
 	build_command_line(main, dict);
 	build_warnings_table(main, dict);

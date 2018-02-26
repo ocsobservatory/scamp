@@ -425,7 +425,7 @@ JsonOut_generate()
         json_object_object_add(o, "value", json_object_new_double(field->expotime));
         json_object_array_add(field_row, o);
 
-        o = new_json_object("AirMass", "float", NULL, "obs.airMass");
+        o = new_json_object("Air_Mass", "float", NULL, "obs.airMass");
         json_object_object_add(o, "value", json_object_new_double(field->airmass));
         json_object_array_add(field_row, o);
 
@@ -438,7 +438,7 @@ JsonOut_generate()
 
         o = new_json_object("Pixel_Scale", "float array", "%s", "instr.scale;instr.pixel;stat.mean");
         p = json_object_new_array();
-        for (j=1; j<field->naxis; j++)
+        for (j=0; j<field->naxis; j++)
             json_object_array_add(p, json_object_new_double(field->meanwcsscale[j] * deg2arcsec));
         json_object_object_add(o, "value", p);
         json_object_array_add(field_row, o);
@@ -452,11 +452,11 @@ JsonOut_generate()
         json_object_array_add(field_row, o);
 
         if (prefs.match_flag) {
-            o = new_json_object("DPixelScale", "float", NULL, "instr.scale;instr.pixel;arith.ratio");
+            o = new_json_object("DPixel_Scale", "float", NULL, "instr.scale;instr.pixel;arith.ratio");
             json_object_object_add(o, "value", json_object_new_double(field->match_dscale));
             json_object_array_add(field_row, o);
 
-            o = new_json_object("DPosAngle", "float", "deg", "pos.posAng;obs.image;arith.diff");
+            o = new_json_object("DPos_Angle", "float", "deg", "pos.posAng;obs.image;arith.diff");
             json_object_object_add(o, "value", json_object_new_double(field->match_dangle));
             json_object_array_add(field_row, o);
 
