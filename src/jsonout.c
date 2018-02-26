@@ -894,7 +894,7 @@ JsonOut_generate()
 
         o = new_json_object("Keys", "string array", NULL, "meta.note");
         p = json_object_new_array();
-        for (j=0; j<prefs.nphotinstrustr; j++) {
+        for (j=0; j<len; j++) {
             snprintf(strbuff, MAXCHAR, "%32.32s ", prefs.astrinstrustr[i] + (j*80));
             json_object_array_add(p, json_object_new_string(strbuff));
         }
