@@ -110,7 +110,7 @@ build_fields_table(json_object *main, Dict *dict)
 			if (strcmp(strkey, "Photom_Flag") == 0) {
 				if (json_object_get_boolean(val))
 					photom_flag = 1;
-				Mstc_dict_setFValue(sub, "Flags", "wtf!! %c%c",
+				Mstc_dict_setFValue(sub, "Flags", "%c%c",
 					ext_header  == 1 ? 'H' : '-',
 					photom_flag == 1 ? 'P' : '-');
 				continue;
@@ -123,13 +123,13 @@ build_fields_table(json_object *main, Dict *dict)
 			} 
 
 			if (strcmp(strkey, "Astr_Instrum") == 0) {
-				Mstc_dict_setFValue(sub, "Astr_Instrum", "wtf!!! %s",
+				Mstc_dict_setFValue(sub, "Astr_Instrum", "%s",
 				    json_object_get_string(val));
 				continue;
 			} 
 
 			if (strcmp(strkey, "Phot_Instrum") == 0) {
-				Mstc_dict_setFValue(sub, "Phot_Instrum", "wtf!!! %s",
+				Mstc_dict_setFValue(sub, "Phot_Instrum", "%s",
 				    json_object_get_string(val));
 				continue;
 			} 
@@ -260,6 +260,94 @@ build_fields_table(json_object *main, Dict *dict)
 void
 build_fgroups_table(json_object *main, Dict *dict)
 {
+	json_object *table, *key, *val, *item, *elem, *elem2;
+	double v;
+	char buff[MAXCHAR], *strkey, sign;
+	Dict *sub;
+	int i, j, k, tlen, ilen, olen, ccount;
+
+	if (json_object_object_get_ex(main, "Fgroups", &table) == 0)
+		return;
+
+	tlen  = json_object_array_length(table);
+	for (i=0; i<tlen; i++) {
+		item = json_object_array_get_idx(table, i);
+		sub = Mstc_dict_addSectionItem(dict, "Fgroups");
+
+		ilen = json_object_array_length(item);
+		for (j=0; j<ilen; j++) {
+			elem = json_object_array_get_idx(item, j);
+
+			json_object_object_get_ex(elem, "name", &key);
+			if (key == NULL) continue;
+
+			json_object_object_get_ex(elem, "value", &val);
+			strkey = (char*) json_object_get_string(key);
+
+			if (strcmp(strkey, "Name") == 0) {
+				Mstc_dict_setValue(sub, "Name", 
+				    json_object_get_string(val));
+				continue;
+			} 
+			if (strcmp(strkey, "Index") == 0) {
+				Mstc_dict_setFValue(sub, "Index", "%i",
+				    json_object_get_int(val));
+				continue;
+			} 
+			if (strcmp(strkey, "NFields") == 0) {
+				Mstc_dict_setFValue(sub, "NFields", "%i",
+				    json_object_get_int(val));
+				continue;
+			} 
+			if (strcmp(strkey, "Field_Coordinates") == 0) {
+				elem2 = json_object_array_get_idx(val, 0);
+				v = json_object_get_double(elem2);
+				Mstc_dict_setFValue(sub, "Right_Ascension", "%0.0f:%.0f:%.2f", 
+					floor(v / 15), 
+					floor(fmod(v*4, 60)) ,
+					floor(fmod(v*240, 60)));
+				elem2 = json_object_array_get_idx(val, 1);
+				v = json_object_get_double(elem2);
+				sign = '+';
+				if (v < 0) {sign = '-'; v = 0 - v;}
+				Mstc_dict_setFValue(sub, "Declination", "%c%.0f:%.0f:%.1f", 
+					sign,
+					floor(v),
+					floor(fmod(v * 60, 60)),
+					floor(fmod(v * 3600, 60)));
+				continue;
+			} 
+
+			if (strcmp(strkey, "Pixel_Scale") == 0) {
+				double a, b;
+				elem2 = json_object_array_get_idx(val, 0);
+				a = json_object_get_double(elem2);
+				elem2 = json_object_array_get_idx(val, 1);
+				b = json_object_get_double(elem2);
+				Mstc_dict_setFValue(sub, "Pixel_Scale", "%0.4g''", 
+				    (a + b) / 2.0);
+				continue;
+			} 
+
+			if (strcmp(strkey, "Max_Radius") == 0) {
+				Mstc_dict_setFValue(sub, "Max_Radius", "%0.4f",
+				    json_object_get_double(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "AstRef_Catalog") == 0) {
+				Mstc_dict_setValue(sub, "AstRef_Catalog",
+				    json_object_get_string(val));
+				continue;
+			} 
+
+			if (strcmp(strkey, "AstRef_Band") == 0) {
+				Mstc_dict_setValue(sub, "AstRef_Band",
+				    json_object_get_string(val));
+				continue;
+			} 
+		}
+	}
 }
 
 void

@@ -593,23 +593,23 @@ JsonOut_generate()
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("Index", "int", NULL, "meta.record;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(i+1));
+        json_object_object_add(o, "value", json_object_new_int(i+1));
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("NFields", "int", NULL, "meta.number;meta.dataset");
-        json_object_object_add(o, "value", json_object_new_double(fgroup->nfield));
+        json_object_object_add(o, "value", json_object_new_int(fgroup->nfield));
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("NAxis", "int", NULL, "pos.wcs.naxis");
-        json_object_object_add(o, "value", json_object_new_double(fgroup->naxis));
+        json_object_object_add(o, "value", json_object_new_int(fgroup->naxis));
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("Lng_Axis", "int", NULL, "meta.id;pos.eq.ra");
-        json_object_object_add(o, "value", json_object_new_double(fgroup->lng));
+        json_object_object_add(o, "value", json_object_new_int(fgroup->lng));
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("Lat_Axis", "int", NULL, "meta.id;pos.eq.de");
-        json_object_object_add(o, "value", json_object_new_double(fgroup->lat));
+        json_object_object_add(o, "value", json_object_new_int(fgroup->lat));
         json_object_array_add(fgroup_row, o);
 
         o = new_json_object("Field_Coordinates", "double array", NULL, "pos.eq.ra;pos.eq.dec;obs.field");

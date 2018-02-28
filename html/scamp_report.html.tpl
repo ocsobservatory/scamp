@@ -129,12 +129,12 @@
 				<td>{{Name}}</td>
 				<td>{{Index}}</td>
 				<td>{{NFields}}</td>
-				<td>{{r_asc}}</td>
-				<td>{{dec}}</td>
-				<td>{{pix_scale}}</td>
-				<td>{{max_radius}}</td>
-				<td>{{astr_ref_cat}}</td>
-				<td>{{astr_ref_band}}</td>
+				<td>{{Right_Ascension}}</td>
+				<td>{{Declination}}</td>
+				<td>{{Pixel_Scale}}</td>
+				<td>{{Max_Radius}}</td>
+				<td>{{AstRef_Catalog}}</td>
+				<td>{{AstRef_Band}}</td>
 				<td>{{astr_qint}}</td>
 				<td>{{astr_pint}}</td>
 				<td>{{astr_x2int}}</td>
