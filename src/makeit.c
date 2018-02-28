@@ -117,17 +117,11 @@ void	makeit(void)
         prefs.time_diff = difftime(thetime2, thetime);
 
         /*-- Write JSON */
-        if (prefs.json_flag || prefs.html_flag)
+        if (prefs.json_flag)
         {
-            JsonOut_set_data(NULL, 0, NULL, 0);
-            json_object *js = JsonOut_generate();
-
-            if (prefs.json_flag)
-                JsonOut_write(prefs.json_name, js);
-            if (prefs.html_flag)
-                HtmlOut_write(prefs.html_name, js);
-
-            JsonOut_free(js);
+            JsonOut_write();
+			if (prefs.html_flag)
+                HtmlOut_write();
         }
         return;
     }
@@ -660,13 +654,10 @@ void	makeit(void)
     }
 
     /* Write JSON/HTML */
-    if (prefs.json_flag || prefs.html_flag) {
-        json_object *js = JsonOut_generate();
+    if (prefs.json_flag) {
+		JsonOut_write();
         if (prefs.html_flag)
-            HtmlOut_write(prefs.html_name, js);
-        if (prefs.json_flag)
-            JsonOut_write(prefs.json_name, js);
-        JsonOut_free(js);
+            HtmlOut_write();
     }
 
     /* Clean-up stuff */

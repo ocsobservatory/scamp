@@ -26,7 +26,7 @@
 #
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-SUBDIRS		= fits wcs mustache
+SUBDIRS		= fits wcs
 
 if USE_PLPLOT
 CPLOTSOURCE	= astrcplot.c cplot.c photcplot.c
@@ -45,8 +45,8 @@ scamp_SOURCES	= astrefcat.c astrsolve.c astrstats.c catout.c check.c \
 		  proper.h pqueue.h quadtree.h samples.h threads.h types.h \
 		  url.h wcscelsys.h htmlout.h jsonout.h
 scamp_CFLAGS = $(JSON_CFLAGS)
-scamp_LDADD	= $(srcdir)/fits/libfits.a \
-		  $(srcdir)/wcs/libwcs_c.a \
-		  $(srcdir)/mustache/libmustache.a $(JSON_LIBS)
+scamp_LDADD	= 	$(srcdir)/fits/libfits.a \
+		  		$(srcdir)/wcs/libwcs_c.a \
+		  		$(JSON_LIBS)
 DATE=`date +"%Y-%m-%d"`
 

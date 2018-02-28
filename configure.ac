@@ -206,10 +206,10 @@ AC_ARG_WITH(plplot-incdir,
 
 
 # Provide a special option for the default HTML template
-with_html_tpl=""$(URBI_RESOLVE_DIR([$datadir]))"/$PACKAGE_TARNAME/scamp_report.html.tpl"
+with_html_tpl=""$(URBI_RESOLVE_DIR([$datadir]))"/$PACKAGE_TARNAME/scamp.html.tpl"
 AC_ARG_WITH(html_tpl,
 	[AS_HELP_STRING([--with-html_tpl=<default URL for HTML template>],
-	[Provide an alternative default template of the mustache engine])])
+	[Provide an alternative default template of the html output])])
 
 AC_DEFINE_UNQUOTED([HTML_TPL], "$with_html_tpl",[Default URL of the HTML template])
 
@@ -381,7 +381,6 @@ man/scamp.1
 src/Makefile
 src/fits/Makefile
 src/wcs/Makefile
-src/mustache/Makefile
 tests/Makefile
 ])
 AC_OUTPUT

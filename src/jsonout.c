@@ -230,8 +230,8 @@ get_next_fgroup_plot(char**name) {
 }
 #endif /* HAVE_PLPLOT */
 
-json_object*
-JsonOut_generate()
+void
+JsonOut_write()
 {
     json_object *main_obj = json_object_new_object();
     json_object *tables = json_object_new_object();
@@ -1083,25 +1083,15 @@ JsonOut_generate()
     }
     json_object_object_add(main_obj, "Configuration", conf_array);
 
-    return main_obj;
-}
 
-void
-JsonOut_write(char *filename, json_object *js)
-{
-
-    FILE *fd = fopen(filename, "w");
+    FILE *fd = fopen(prefs.json_name, "w");
     if (!fd) {
-        perror(filename);
+        perror(prefs.json_name);
     } else {
-        char *output = (char*) json_object_to_json_string(js);
+        char *output = (char*) json_object_to_json_string(main_obj);
         fwrite(output, 1, strlen(output), fd);
         fclose(fd);
     }
 
-}
-
-void
-JsonOut_free(json_object *obj) {
-    json_object_put(obj); /* What the fuck */
+    json_object_put(main_obj); /* What the fuck */
 }

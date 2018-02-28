@@ -8,8 +8,6 @@
 
 /* not thread safe */
 void JsonOut_set_data(fieldstruct**,int,fgroupstruct**,int);
-json_object *JsonOut_generate();
-void JsonOut_write(char *filename, json_object *js);
-void JsonOut_free(json_object *obj);
+void JsonOut_write();
 
 #endif /* _JSONOUT_H_ */
