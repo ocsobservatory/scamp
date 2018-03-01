@@ -622,7 +622,7 @@ JsonOut_write()
         o = new_json_object("Pixel_Scale", "float array", NULL, "instr.pixel;obs.field;stat.mean");
         p = json_object_new_array();
         for (j=0; j<fgroup->naxis; j++)
-            json_object_array_add(p, json_object_new_double(fgroup->meanwcsscale[j]*deg2arcmin));
+            json_object_array_add(p, json_object_new_double(fgroup->meanwcsscale[j]*deg2arcsec));
         json_object_object_add(o, "value", p);
         json_object_array_add(fgroup_row, o);
 
@@ -1075,8 +1075,8 @@ JsonOut_write()
                 break;
         }
 
-        json_object_object_add(o, "type", json_object_new_string(strtype));
-        json_object_object_add(o, "key", json_object_new_string(key[i].name));
+        json_object_object_add(o, "datatype", json_object_new_string(strtype));
+        json_object_object_add(o, "name", json_object_new_string(key[i].name));
         json_object_object_add(o, "value", val);
         json_object_array_add(conf_array, o);
 

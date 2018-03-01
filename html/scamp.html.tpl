@@ -80,7 +80,7 @@
 			<thead>
 				<tr>
 					<th>Group name</th>
-					<th class="opt">Group Plot</th>
+					<th class="showplot">Group Plot</th>
 					<th>Index</th>
 					<th>NFields</th>
 					<th>Right Ascension</th>
@@ -89,7 +89,7 @@
 					<th>Maximum radius</th>
 					<th>Astrom. Ref. Catalog</th>
 					<th>Astrom. Ref. Band</th>
-					<th class="opt">&#967;2 Plot</th>
+					<th class="showplot">&#967;2 Plot</th>
 					<th>Astrom. &#963;int</th>
 					<th>Astrom. &#961;int</th>
 					<th>Astrom. &#967;2int</th>
@@ -98,6 +98,8 @@
 					<th>Astrom. &#961;int High S/N</th>
 					<th>Astrom. &#947;2int High S/N</th>
 					<th>Astrom. N2int High S/N</th>
+					<th class="showplot">Astrom. 1-D Int. Error Plot</th>
+					<th class="showplot">Astrom. 2-D Int. Error Plot</th>
 					<th>Astrom. &#916;RA ref, &#916; DEC ref</th>
 					<th>Astrom. &#963;ref</th>
 					<th>Astrom. &#961;ref</th>
@@ -108,6 +110,8 @@
 					<th>Astrom. &#961;ref High S/N</th>
 					<th>Astrom. &#947;2ref High S/N</th>
 					<th>Astrom. Nref High S/N</th>
+					<th class="showplot">Astrom. 1-D Ref. Error Plot</th>
+					<th class="showplot">Astrom. 2-D Ref. Error Plot</th>
 					<th>Photom. instruments</th>
 					<th>Photom. &#963;int</th>
 					<th>Photom. &#967;2int</th>
@@ -121,6 +125,7 @@
 					<th>Photom. &#963;ref High S/N</th>
 					<th>Photom. &#947;2ref High S/N</th>
 					<th>Photom. Nref High S/N</th>
+					<th class="showplot">Photom. Internal Error Plot</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -136,7 +141,7 @@
 					<th>NFields</th>
 					<th>Number of Keywords</th>
 					<th>Keywords</th>
-					<th>DistPlot</th>
+					<th class="showplot">Distortion Plot</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -150,9 +155,9 @@
 					<th>Name</th>
 					<th>Index</th>
 					<th>NFields</th>
+					<th>Output ZP</th>
 					<th>Number of Keywords</th>
 					<th>Keywords</th>
-					<th>DistPlot</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -160,15 +165,11 @@
 		</table>
 
 		<h2>Configuration file</h2>
-		<table id="configurationTable" class="table table-striped">
+		<table id="configTable" class="table table-striped">
 			<thead>
 				<tr>
-					<th>Name</th>
-					<th>Index</th>
-					<th>NFields</th>
-					<th>Number of Keywords</th>
-					<th>Keywords</th>
-					<th>DistPlot</th>
+					<th>Config Parameter</th>
+					<th>Value</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -179,12 +180,9 @@
 		<table id="warningsTable" class="table table-striped">
 			<thead>
 				<tr>
-					<th>Name</th>
-					<th>Index</th>
-					<th>NFields</th>
-					<th>Number of Keywords</th>
-					<th>Keywords</th>
-					<th>DistPlot</th>
+					<th>Date</th>
+					<th>Time</th>
+					<th>Message</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -258,12 +256,19 @@
 				return value / n;
 			}
 
-			function getElemListVal(str, unit, data) {
+			function getElemListValFixed(str, unit, fix, data) {
 				var value = "";
 				$.each(getElemVal(str, data), function(i, elem) {
+					if (fix >= 0) {
+						elem = elem.toFixed(fix);
+					}
 					value += elem + unit + " ";
 				});
 				return value;
+			}
+
+			function getElemListVal(str, unit, data) {
+				return getElemListValFixed(str, unit, -1, data);
 			}
 
 			function buildDegreeVal(value) {
@@ -297,6 +302,7 @@
 			$(document).ready(function() {
 				console.log(scamp_data);
 
+
 				/* 
 				 * build fields table 
 				 */
@@ -322,8 +328,8 @@
 					table_row += "<td>" +  getElemVal("DPixel_Scale", field).toFixed(4) + "</td>";
 					table_row += "<td>" +  getElemVal("DPos_Angle", field) + "°" + "</td>";
 					table_row += "<td>" +  getElemVal("AS_Contrast", field).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("DX", field).toExponential() + "</td>";
-					table_row += "<td>" +  getElemVal("DY", field).toExponential() + "</td>";
+					table_row += "<td>" +  getElemVal("DX", field).toExponential() + "°" + "</td>";
+					table_row += "<td>" +  getElemVal("DY", field).toExponential() + "°" + "</td>";
 					table_row += "<td>" +  getElemVal("XY_Contrast", field).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("Chi2_Internal", field).toFixed(2) + "</td>";
 					table_row += "<td>" +  getElemVal("Chi2_Internal_HighSN", field).toFixed(2) + "</td>";
@@ -334,48 +340,133 @@
 					$(table_row).appendTo("#fieldsTable tbody");
 				});
 
+
 				/* 
 				 * build fields groups table 
 				 */
 				$.each(scamp_data.Fgroups, function(i, group) {
 					var table_row = "";
-					console.log(group);
 					table_row += "<tr>";
 					table_row += "<td>" +  getElemVal("Name", group) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("FgroupsPlot", group) + "\"></td>";
 					table_row += "<td>" +  getElemVal("Index", group) + "</td>";
 					table_row += "<td>" +  getElemVal("NFields", group) + "</td>";
-					table_row += "<td>" +  "ra" + "</td>";
-					table_row += "<td>" +  "dec" + "</td>";
-					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", group) + "</td>";
-					table_row += "<td>" +  getElemVal("Max_Radius", group) + "</td>";
+					table_row += "<td>" +  getRaVal("Field_Coordinates", group) + "</td>";
+					table_row += "<td>" +  getDecVal("Field_Coordinates", group) + "</td>";
+					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", group).toFixed(4) + "''" + "</td>";
+					table_row += "<td>" +  getElemVal("Max_Radius", group).toFixed(3) + "'" + "</td>";
 					table_row += "<td>" +  getElemVal("AstRef_Catalog", group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstRef_Band", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromSigma_Internal", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Internal", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Internal", group) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("Chi2Plot", group) + "\"></td>";
+					table_row += "<td>" +  getElemListValFixed("AstromSigma_Internal", "'' ", 4, group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Internal", group).toFixed(5) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Internal", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Internal", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromSigma_Internal_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Internal_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("AstromSigma_Internal_HighSN", "'' ", 4, group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Internal_HighSN", group).toFixed(5)  + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Internal_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemListVal("AstromOffset_Reference", "''", group) + "</td>";
-					table_row += "<td>" +  getElemListVal("AstromSigma_Reference", "''", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Reference", group) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr1DimPlot", group) + "\"></td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr2DimPlot", group) + "\"></td>";
+					table_row += "<td>" +  getElemListValFixed("AstromOffset_Reference", "'' ", 4, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("AstromSigma_Reference", "'' ", 3, group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group).toFixed(4) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Reference", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Reference", group) + "</td>";
-					table_row += "<td>" +  getElemListVal("AstromOffset_Reference_HighSN", "''", group) + "</td>";
-					table_row += "<td>" +  getElemListVal("AstromSigma_Reference_HighSN", "''", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Reference_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("AstromOffset_Reference_HighSN", "'' ", 4, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("AstromSigma_Reference_HighSN", "'' ", 3, group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Reference_HighSN", group).toFixed(4) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Reference_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemListVal("PhotInstru_Name", ",", group) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr1DimPlot", group) + "\"></td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr2DimPlot", group) + "\"></td>";
+					table_row += "<td>" +  getElemListVal("PhotInstru_Name",", ", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotSigma_Internal", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotChi2_Internal", " ", 4, group) + "</td>";
+					table_row += "<td>" +  getElemListVal("PhotNDets_Internal", " ", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotSigma_Internal_HighSN", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotChi2_Internal_HighSN", " ", 2, group) + "</td>";
+					table_row += "<td>" +  getElemListVal("PhotNDets_Internal_HighSN", " ", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotSigma_Reference", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListVal("PhotNDets_Reference", " ", group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotSigma_Reference_HighSN", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference_HighSN", " ", 6, group) + "</td>";
+					table_row += "<td>" +  getElemListVal("PhotNDets_Reference_HighSN", " ", group) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("PhotErrPlot", group) + "\"></td>";
 					table_row += "</tr>";
-				
 					$(table_row).appendTo("#groupsTable tbody");
 				});
 
-				
+
+				/* 
+				 * build astrometric instruments table 
+				 */
+				$.each(scamp_data.AstroInstruments, function(i, astroinstru) {
+					var table_row = "";
+					table_row += "<tr>";
+					table_row += "<td>" +  getElemVal("Name", astroinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("Index", astroinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("NFields", astroinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("NKeys", astroinstru) + "</td>";
+					table_row += "<td>" +  getElemListVal("Keys", " ", astroinstru) + "</td>";
+					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("DistPlot", astroinstru) + "\"></td>";
+					table_row += "</tr>";
+					$(table_row).appendTo("#astrometricInstrumentsTable tbody");
+				});
+
+
+				/* 
+				 * build photometric instruments table 
+				 */
+				$.each(scamp_data.PhotInstruments, function(i, photoinstru) {
+					var table_row = "";
+					table_row += "<tr>";
+					table_row += "<td>" +  getElemVal("Name", photoinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("Index", photoinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("Index", photoinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("MagZeroPoint_Output", photoinstru) + "</td>";
+					table_row += "<td>" +  getElemVal("NKeys", photoinstru) + "</td>";
+					table_row += "<td>" +  getElemListVal("Keys", " ", photoinstru) + "</td>";
+					table_row += "</tr>";
+					$(table_row).appendTo("#photometricInstrumentsTable tbody");
+				});
+
+
+				/* 
+				 * build configuration table 
+				 */
+				$.each(scamp_data.Configuration, function(i, config) {
+					var table_row = "";
+					table_row += "<tr>";
+					table_row += "<td>" +  config.key + "</td>";
+
+					var value = "";
+					if (config.type.includes("array")) {
+						for (var i = 0; i < config.value.length; i++) {
+							value += config.value[i] + ", ";
+						}
+					} else {
+						value = config.value;
+					}
+					table_row += "<td>" +  value + "</td>";
+					table_row += "</tr>";
+					$(table_row).appendTo("#configTable tbody");
+				});
+
+
+				/* 
+				 * build warnings table 
+				 */
+				$.each(scamp_data.Warnings, function(i, warn) {
+					var table_row = "";
+					table_row += "<tr>";
+					table_row += "<td>" +  getElemVal("Date", warn) + "</td>";
+					table_row += "<td>" +  getElemVal("Time", warn) + "</td>";
+					table_row += "<td>" +  getElemVal("Text", warn) + "</td>";
+					$(table_row).appendTo("#warningsTable tbody");
+				});
+
 			});
 		</script>
 
