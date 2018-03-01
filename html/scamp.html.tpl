@@ -302,6 +302,16 @@
 			$(document).ready(function() {
 				console.log(scamp_data);
 
+				var showmatch = getElemVal("MATCH", scamp_data.Configuration);
+				var showplot = getElemVal("CHECK_PLOT_DEV");
+				if (showplot > "PNG") {
+					showplot = false;
+				} else {
+					if (showplot < "PNG") {
+						showplot = false;
+					}
+					showplot = true;
+				}
 
 				/* 
 				 * build fields table 
@@ -439,10 +449,10 @@
 				$.each(scamp_data.Configuration, function(i, config) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  config.key + "</td>";
+					table_row += "<td>" +  config.name + "</td>";
 
 					var value = "";
-					if (config.type.includes("array")) {
+					if (config.datatype.includes("array")) {
 						for (var i = 0; i < config.value.length; i++) {
 							value += config.value[i] + ", ";
 						}
@@ -466,7 +476,6 @@
 					table_row += "<td>" +  getElemVal("Text", warn) + "</td>";
 					$(table_row).appendTo("#warningsTable tbody");
 				});
-
 			});
 		</script>
 
