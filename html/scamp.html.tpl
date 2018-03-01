@@ -35,96 +35,7 @@
     	<![endif]-->
 	</head>
 	<body>
-	
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">Project name</a>
-          <div class="nav-collapse collapse">
-            <p class="navbar-text pull-right">
-              Logged in as <a href="#" class="navbar-link">Username</a>
-            </p>
-            <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
 
-	   <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list">
-              <li class="nav-header">Sidebar</li>
-              <li class="active"><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-            </ul>
-          </div><!--/.well -->
-        </div><!--/span-->
-        <div class="span9">
-          <div class="hero-unit">
-            <h1>Hello, world!</h1>
-            <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-            <p><a href="#" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-          </div>
-          <div class="row-fluid">
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-          </div><!--/row-->
-          <div class="row-fluid">
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-            <div class="span4">
-              <h2>Heading</h2>
-              <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-              <p><a class="btn" href="#">View details &raquo;</a></p>
-            </div><!--/span-->
-          </div><!--/row-->
-        </div><!--/span-->
-      </div><!--/row-->
 		<h1>Processing summary</h1>
 
 		<h2>Summary Table on Input Files</h2>
@@ -147,12 +58,12 @@
 					<th>Declination</th>
 					<th>Radius</th>
 					<th>Pixel scale</th>
-					    <th>&#916;Pixel scale</th>
-					    <th>&#916;Position Angle</th>
-					    <th>A/S contrast</th>
-					    <th>&#916;X</th>
-					    <th>&#916;Y</th>
-					    <th>X/Y contrast</th>
+					<th class="showmatch">&#916;Pixel scale</th>
+					<th class="showmatch">&#916;Position Angle</th>
+					<th class="showmatch">A/S contrast</th>
+					<th class="showmatch">&#916;X</th>
+					<th class="showmatch">&#916;Y</th>
+					<th class="showmatch">X/Y contrast</th>
 				    <th>&#967;2int</th>
 					<th>&#967;2int High S/N</th>
 					<th>&#967;2ref</th>
@@ -169,6 +80,7 @@
 			<thead>
 				<tr>
 					<th>Group name</th>
+					<th class="opt">Group Plot</th>
 					<th>Index</th>
 					<th>NFields</th>
 					<th>Right Ascension</th>
@@ -177,6 +89,7 @@
 					<th>Maximum radius</th>
 					<th>Astrom. Ref. Catalog</th>
 					<th>Astrom. Ref. Band</th>
+					<th class="opt">&#967;2 Plot</th>
 					<th>Astrom. &#963;int</th>
 					<th>Astrom. &#961;int</th>
 					<th>Astrom. &#967;2int</th>
@@ -328,6 +241,13 @@
 				return value;
 			}
 
+			function getFlagVal(str, t, data) {
+				if (getElemVal(str, data))
+					return t;
+				return "-";
+			}
+
+		
 			function getElemAverageVal(str, data) {
 				var value = 0.0;
 				var n = 0;
@@ -336,6 +256,42 @@
 					n++;
 				});
 				return value / n;
+			}
+
+			function getElemListVal(str, unit, data) {
+				var value = "";
+				$.each(getElemVal(str, data), function(i, elem) {
+					value += elem + unit + " ";
+				});
+				return value;
+			}
+
+			function buildDegreeVal(value) {
+				if (value < 0)
+					value = 0 - value;
+				
+			}
+
+			function getRaVal(str, data) {
+				var value = getElemVal(str, data);
+				var a = Math.floor(value[0] / 15.0);
+				var b = Math.floor((value[0] * 4) % 60);
+				var c = Math.floor((value[0] *240) % 60);
+				return a + ":" + b + ":" + c.toFixed(2);
+			}
+
+			function getDecVal(str, data) {
+				var value = getElemVal(str, data);
+				var sign = "";
+				if (value[1] < 0) {
+					sign = "-";
+					value[1] = 0 - value[1];
+				}
+				var a = Math.floor(value[1]);
+				var b = Math.floor((value[1] * 60) % 60);
+				var c = Math.floor((value[1] * 3600) % 60);
+
+				return sign + a + ":" + b + ":" + c.toFixed(2);
 			}
 
 			$(document).ready(function() {
@@ -352,28 +308,28 @@
 					table_row += "<td>" +  getElemVal("Image_Ident", field) + "</td>";
 					table_row += "<td>" +  getElemVal("NExtensions", field) + "</td>";
 					table_row += "<td>" +  getElemVal("NDetect", field) + "</td>";
-					table_row += "<td>" +  "flags" + "</td>";
+					table_row += "<td>" +  getFlagVal("Ext_Header", "H", field)  + getFlagVal("Photom_Flag", "P", field) +  "</td>";
 					table_row += "<td>" +  getElemVal("Group", field) + "</td>";
 					table_row += "<td>" +  getElemVal("Astr_Instrum", field) + "</td>";
 					table_row += "<td>" +  getElemVal("Phot_Instrum", field) + "</td>";
 					table_row += "<td>" +  getElemVal("Observation_Date", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Exposure_Time", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Air_Mass", field) + "</td>";
-					table_row += "<td>" +  "ra" + "</td>";
-					table_row += "<td>" +  "dec" + "</td>";
-					table_row += "<td>" +  getElemVal("Max_Radius", field) + "</td>";
-					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", field) + "</td>";
-					table_row += "<td>" +  getElemVal("DPixel_Scale", field) + "</td>";
-					table_row += "<td>" +  getElemVal("DPos_Angle", field) + "</td>";
-					table_row += "<td>" +  getElemVal("AS_Contrast", field) + "</td>";
-					table_row += "<td>" +  getElemVal("DX", field) + "</td>";
-					table_row += "<td>" +  getElemVal("DY", field) + "</td>";
-					table_row += "<td>" +  getElemVal("XY_Contrast", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Internal", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Internal_HighSN", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Reference", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Reference_HighSN", field) + "</td>";
-					table_row += "<td>" +  getElemVal("ZeroPoint_Corr", field) + "</td>";
+					table_row += "<td>" +  getElemVal("Exposure_Time", field).toFixed(3) + "</td>";
+					table_row += "<td>" +  getElemVal("Air_Mass", field).toFixed(2) + "</td>";
+					table_row += "<td>" +  getRaVal("Field_Coordinates", field) + "</td>";
+					table_row += "<td>" +  getDecVal("Field_Coordinates", field) + "</td>";
+					table_row += "<td>" +  getElemVal("Max_Radius", field).toFixed(3) + "'" + "</td>";
+					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", field).toFixed(4) + "''" + "</td>";
+					table_row += "<td>" +  getElemVal("DPixel_Scale", field).toFixed(4) + "</td>";
+					table_row += "<td>" +  getElemVal("DPos_Angle", field) + "°" + "</td>";
+					table_row += "<td>" +  getElemVal("AS_Contrast", field).toFixed(1) + "</td>";
+					table_row += "<td>" +  getElemVal("DX", field).toExponential() + "</td>";
+					table_row += "<td>" +  getElemVal("DY", field).toExponential() + "</td>";
+					table_row += "<td>" +  getElemVal("XY_Contrast", field).toFixed(1) + "</td>";
+					table_row += "<td>" +  getElemVal("Chi2_Internal", field).toFixed(2) + "</td>";
+					table_row += "<td>" +  getElemVal("Chi2_Internal_HighSN", field).toFixed(2) + "</td>";
+					table_row += "<td>" +  getElemVal("Chi2_Reference", field).toFixed(2) + "</td>";
+					table_row += "<td>" +  getElemVal("Chi2_Reference_HighSN", field).toFixed(2) + "</td>";
+					table_row += "<td>" +  getElemVal("ZeroPoint_Corr", field).toFixed(3) + "</td>";
 					table_row += "</tr>";
 					$(table_row).appendTo("#fieldsTable tbody");
 				});
@@ -401,7 +357,19 @@
 					table_row += "<td>" +  getElemVal("AstromSigma_Internal_HighSN", group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromCorr_Internal_HighSN", group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group) + "</td>";
-					table_row += "<td>" +  getElemVal("", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromNDets_Internal_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemListVal("AstromOffset_Reference", "''", group) + "</td>";
+					table_row += "<td>" +  getElemListVal("AstromSigma_Reference", "''", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Reference", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromNDets_Reference", group) + "</td>";
+					table_row += "<td>" +  getElemListVal("AstromOffset_Reference_HighSN", "''", group) + "</td>";
+					table_row += "<td>" +  getElemListVal("AstromSigma_Reference_HighSN", "''", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromCorr_Reference_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemVal("AstromNDets_Reference_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemListVal("PhotInstru_Name", ",", group) + "</td>";
 					table_row += "</tr>";
 				
 					$(table_row).appendTo("#groupsTable tbody");

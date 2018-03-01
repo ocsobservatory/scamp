@@ -388,7 +388,7 @@ JsonOut_write()
         json_object_array_add(field_row, o);
 
         o = new_json_object("Ext_Header", "boolean", NULL, "meta.code");
-        json_object_object_add(o, "value", json_object_new_boolean(field->headflag));
+        json_object_object_add(o, "value", json_object_new_boolean(field->headflag == 1 ? 1 : 0));
         json_object_array_add(field_row, o);
 
         o = new_json_object("NDetect", "int", NULL, "meta.number;src");
@@ -410,7 +410,7 @@ JsonOut_write()
         json_object_array_add(field_row, o);
 
         o = new_json_object("Photom_Flag", "boolean", NULL, "meta.code;phot");
-        json_object_object_add(o, "value", json_object_new_boolean(field->photomflag));
+        json_object_object_add(o, "value", json_object_new_boolean(field->photomflag == 1 ? 1 : 0));
         json_object_array_add(field_row, o);
 
         o = new_json_object("Photom_Link", "boolean", NULL, "meta.code;phot");
