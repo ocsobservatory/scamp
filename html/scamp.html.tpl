@@ -36,12 +36,21 @@
 	</head>
 	<body>
 
+		<div id="cont" class="container" role="main">
 		<h1>Processing summary</h1>
+		<div class="alert alert-success">
+		<strong><span id="soft"></span></strong> completed on <strong><span id="date"></span></strong>
+			at <strong><span id="time"></span></strong> using <strong><span id="nthreads"></span> </strong>
+			threads (run time: <strong><span id="runtime"></span></strong>)
+			started by user <strong><span id="username"></span></strong> in <strong><span id="rundir"></span></strong>.
+		</div>
 
-		<h2>Summary Table on Input Files</h2>
-			<table id="fieldsTable" class="table table-striped">
-			    <thead>
-				</tr>
+		<div class="card">
+			<div class="card-header text-center"><h2>Summary Table on Input Files</h2></div>
+			<div class="card-body table-responsive">
+				<table id="fieldsTable" class="table table-hover table-bordered table-striped">
+			    	<thead>
+					</tr>
 					<th>#</th>
 					<th>Filename</th>
 					<th>Identifier</th>
@@ -69,14 +78,18 @@
 					<th>&#967;2ref</th>
 					<th>&#967;2ref High S/N</th>
 					<th>Mag &#916;SP</th>
-				</tr>
-			    </thead>
-				<tbody>
-				</tbody>
-			</table>
+					</tr>
+			    	</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div> <!--card-body-->
+		</div> <!--card -->
 
-		<h2>Group Properties</h2>
-		<table id="groupsTable" class="table table-striped">
+		<div class="card">
+			<div class="card-header text-center"><h2>Group Properties</h2></div>
+			<div class="card-body table-responsive">
+		<table id="groupsTable" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th>Group name</th>
@@ -131,9 +144,11 @@
 			<tbody>
 			</tbody>
 		</table>
+			</div> <!--card-body-->
+		</div> <!--card -->
 
 		<h2>Astrometric Instruments</h2>
-		<table id="astrometricInstrumentsTable" class="table table-striped" >
+		<table id="astrometricInstrumentsTable" class="table table-responsive table-striped" >
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -149,7 +164,7 @@
 		</table>
 
 		<h2>Photometric Instruments</h2>
-		<table id="photometricInstrumentsTable" class="table table-striped">
+		<table id="photometricInstrumentsTable" class="table t table-responsive table-striped">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -165,7 +180,7 @@
 		</table>
 
 		<h2>Configuration file</h2>
-		<table id="configTable" class="table table-striped">
+		<table id="configTable" class="table t table-responsive table-striped">
 			<thead>
 				<tr>
 					<th>Config Parameter</th>
@@ -177,7 +192,7 @@
 		</table>
 
 		<h2>Warnings</h2>
-		<table id="warningsTable" class="table table-striped">
+		<table id="warningsTable" class="table table-responsive table-striped">
 			<thead>
 				<tr>
 					<th>Date</th>
@@ -188,7 +203,14 @@
 			<tbody>
 			</tbody>
 		</table>
+		</div> <!-- #cont -->
+		<!-- END HTML -->
 
+
+
+
+
+		<!-- SCRIPTS BEGIN -->
 		<script 
 			src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
 			integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
@@ -223,6 +245,11 @@
 				} 
 			)();
 		</script>
+
+
+
+
+
 		<script>
 			/*
 			 * Data contained in "scamp_data" object, is loaded at the very end
@@ -302,16 +329,17 @@
 			$(document).ready(function() {
 				console.log(scamp_data);
 
+				$('#soft').text(getElemVal("Name", scamp_data.Software)+" "+getElemVal("Version", scamp_data.Software));
+				$('#date').text(getElemVal("Date", scamp_data.Software));
+				$('#time').text(getElemVal("Time", scamp_data.Software));
+				$('#nthreads').text(getElemVal("NThreads", scamp_data.Software));
+				$('#runtime').text(getElemVal("Duration", scamp_data.Software) + " s");
+				$('#username').text(getElemVal("User", scamp_data.Software));
+				$('#rundir').text(getElemVal("Path", scamp_data.Software));
+
 				var showmatch = getElemVal("MATCH", scamp_data.Configuration);
-				var showplot = getElemVal("CHECK_PLOT_DEV");
-				if (showplot > "PNG") {
-					showplot = false;
-				} else {
-					if (showplot < "PNG") {
-						showplot = false;
-					}
-					showplot = true;
-				}
+				var showplot  = getElemVal("CHECK_PLOT_DEV");
+				showplot = (showplot > "PNG" || showplot > "PNG" ) ? false : true;
 
 				/* 
 				 * build fields table 
@@ -335,12 +363,23 @@
 					table_row += "<td>" +  getDecVal("Field_Coordinates", field) + "</td>";
 					table_row += "<td>" +  getElemVal("Max_Radius", field).toFixed(3) + "'" + "</td>";
 					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", field).toFixed(4) + "''" + "</td>";
-					table_row += "<td>" +  getElemVal("DPixel_Scale", field).toFixed(4) + "</td>";
-					table_row += "<td>" +  getElemVal("DPos_Angle", field) + "°" + "</td>";
-					table_row += "<td>" +  getElemVal("AS_Contrast", field).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("DX", field).toExponential() + "°" + "</td>";
-					table_row += "<td>" +  getElemVal("DY", field).toExponential() + "°" + "</td>";
-					table_row += "<td>" +  getElemVal("XY_Contrast", field).toFixed(1) + "</td>";
+
+					if (showmatch) {
+						table_row += "<td>" +  getElemVal("DPixel_Scale", field).toFixed(4) + "</td>";
+						table_row += "<td>" +  getElemVal("DPos_Angle", field) + "°" + "</td>";
+						table_row += "<td>" +  getElemVal("AS_Contrast", field).toFixed(1) + "</td>";
+						table_row += "<td>" +  getElemVal("DX", field).toExponential() + "°" + "</td>";
+						table_row += "<td>" +  getElemVal("DY", field).toExponential() + "°" + "</td>";
+						table_row += "<td>" +  getElemVal("XY_Contrast", field).toFixed(1) + "</td>";
+					} else {
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+					}
+
 					table_row += "<td>" +  getElemVal("Chi2_Internal", field).toFixed(2) + "</td>";
 					table_row += "<td>" +  getElemVal("Chi2_Internal_HighSN", field).toFixed(2) + "</td>";
 					table_row += "<td>" +  getElemVal("Chi2_Reference", field).toFixed(2) + "</td>";
@@ -358,7 +397,11 @@
 					var table_row = "";
 					table_row += "<tr>";
 					table_row += "<td>" +  getElemVal("Name", group) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("FgroupsPlot", group) + "\"></td>";
+					if (showplot) {
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("FgroupsPlot", group) + "\"></td>";
+					} else {
+						table_row += "<td></td>";
+					}
 					table_row += "<td>" +  getElemVal("Index", group) + "</td>";
 					table_row += "<td>" +  getElemVal("NFields", group) + "</td>";
 					table_row += "<td>" +  getRaVal("Field_Coordinates", group) + "</td>";
@@ -367,7 +410,11 @@
 					table_row += "<td>" +  getElemVal("Max_Radius", group).toFixed(3) + "'" + "</td>";
 					table_row += "<td>" +  getElemVal("AstRef_Catalog", group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstRef_Band", group) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("Chi2Plot", group) + "\"></td>";
+					if (showplot) {
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("Chi2Plot", group) + "\"></td>";
+					} else {
+						table_row += "<td></td>";
+					}
 					table_row += "<td>" +  getElemListValFixed("AstromSigma_Internal", "'' ", 4, group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromCorr_Internal", group).toFixed(5) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromChi2_Internal", group).toFixed(1) + "</td>";
@@ -376,8 +423,13 @@
 					table_row += "<td>" +  getElemVal("AstromCorr_Internal_HighSN", group).toFixed(5)  + "</td>";
 					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Internal_HighSN", group) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr1DimPlot", group) + "\"></td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr2DimPlot", group) + "\"></td>";
+					if (showplot) {
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr1DimPlot", group) + "\"></td>";
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr2DimPlot", group) + "\"></td>";
+					} else {
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+					}
 					table_row += "<td>" +  getElemListValFixed("AstromOffset_Reference", "'' ", 4, group) + "</td>";
 					table_row += "<td>" +  getElemListValFixed("AstromSigma_Reference", "'' ", 3, group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group).toFixed(4) + "</td>";
@@ -388,8 +440,13 @@
 					table_row += "<td>" +  getElemVal("AstromCorr_Reference_HighSN", group).toFixed(4) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Reference_HighSN", group) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr1DimPlot", group) + "\"></td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr2DimPlot", group) + "\"></td>";
+					if (showplot) {
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr1DimPlot", group) + "\"></td>";
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr2DimPlot", group) + "\"></td>";
+					} else {
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+					}
 					table_row += "<td>" +  getElemListVal("PhotInstru_Name",", ", group) + "</td>";
 					table_row += "<td>" +  getElemListValFixed("PhotSigma_Internal", " ", 6, group) + "</td>";
 					table_row += "<td>" +  getElemListValFixed("PhotChi2_Internal", " ", 4, group) + "</td>";
@@ -403,7 +460,12 @@
 					table_row += "<td>" +  getElemListValFixed("PhotSigma_Reference_HighSN", " ", 6, group) + "</td>";
 					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference_HighSN", " ", 6, group) + "</td>";
 					table_row += "<td>" +  getElemListVal("PhotNDets_Reference_HighSN", " ", group) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("PhotErrPlot", group) + "\"></td>";
+					if (showplot) {
+						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("PhotErrPlot", group) + "\"></td>";
+					} else {
+						table_row += "<td></td>";
+					}
+
 					table_row += "</tr>";
 					$(table_row).appendTo("#groupsTable tbody");
 				});
@@ -476,8 +538,49 @@
 					table_row += "<td>" +  getElemVal("Text", warn) + "</td>";
 					$(table_row).appendTo("#warningsTable tbody");
 				});
+
+				/*
+				 * Hide unused columns
+				 */
+				if (!showmatch) {
+					$('#fieldsTable th:nth-child(17)').hide();
+					$('#fieldsTable td:nth-child(17)').hide();
+					$('#fieldsTable th:nth-child(18)').hide();
+					$('#fieldsTable td:nth-child(18)').hide();
+					$('#fieldsTable th:nth-child(19)').hide();
+					$('#fieldsTable td:nth-child(19)').hide();
+					$('#fieldsTable th:nth-child(20)').hide();
+					$('#fieldsTable td:nth-child(20)').hide();
+					$('#fieldsTable th:nth-child(21)').hide();
+					$('#fieldsTable td:nth-child(21)').hide();
+					$('#fieldsTable th:nth-child(22)').hide();
+					$('#fieldsTable td:nth-child(22)').hide();
+				}
+				if (!showplot) {
+					$('#groupsTable th:nth-child(2)').hide();
+					$('#groupsTable td:nth-child(2)').hide();
+					$('#groupsTable th:nth-child(11)').hide();
+					$('#groupsTable td:nth-child(11)').hide();
+					$('#groupsTable th:nth-child(20)').hide();
+					$('#groupsTable td:nth-child(20)').hide();
+					$('#groupsTable th:nth-child(21)').hide();
+					$('#groupsTable td:nth-child(21)').hide();
+					$('#groupsTable th:nth-child(32)').hide();
+					$('#groupsTable td:nth-child(32)').hide();
+					$('#groupsTable th:nth-child(33)').hide();
+					$('#groupsTable td:nth-child(33)').hide();
+					$('#groupsTable th:nth-child(47)').hide();
+					$('#groupsTable td:nth-child(47)').hide();
+				
+				}
+				
 			});
 		</script>
+		<!-- SCRIPTS END -->
+
+
+
+
 
 	</body>
 </html>
