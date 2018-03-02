@@ -302,10 +302,15 @@
 
 
 		<script>
-			/*
-			 * Data contained in "scamp_data" object, is loaded at the very end
-			 * of this html file is his own <script> tag.
-			 */
+            /*                                                                     
+             *                                                                     
+             * Data contained in "scamp_data" object, is loaded at the very end 
+             * of this html file is his own <script> tag.                          
+             *                                                                     
+             */                                                                    
+                                                                                   
+            /* from an array of object (data), return the "value" property of   
+             * object havinig "str" as "name" property. */   
 			function getElemVal(str, data) {
 				var value = "";
 				$.each(data, function (i, elem) {
@@ -317,13 +322,18 @@
 				return value;
 			}
 
+            /* From an array of object (data), take the one having "str" as        
+             * "name" property, and return his "value" or "-". Used                
+             * for flag column in field table */  
 			function getFlagVal(str, t, data) {
 				if (getElemVal(str, data))
 					return t;
 				return "-";
 			}
 
-		
+            /* From an array of object, take the one aving "str" as property       
+             * "name", add values (wich must be an array of numbers), and          
+             * return his average */  
 			function getElemAverageVal(str, data) {
 				var value = 0.0;
 				var n = 0;
@@ -334,6 +344,11 @@
 				return value / n;
 			}
 
+            /* From an array of object (data), take the one with "name" property
+             * equal to "str", and return a formated string with numbers        
+             * floating precision defined by "fix", and unit by "unit".         
+             * Of course, the object "value" must be an array of numbers.       
+             * Setting fix to negative value, do note limit precision. */ 
 			function getElemListValFixed(str, unit, fix, data) {
 				var value = "";
 				$.each(getElemVal(str, data), function(i, elem) {
@@ -349,11 +364,9 @@
 				return getElemListValFixed(str, unit, -1, data);
 			}
 
-			function buildDegreeVal(value) {
-				if (value < 0)
-					value = 0 - value;
-			}
-
+            /* From an array of objects (data), get the one with "name" property
+             * equal to "str", and format a string with his "value" as a        
+             * right ascention representation */
 			function getRaVal(str, data) {
 				var value = getElemVal(str, data);
 				var a = Math.floor(value[0] / 15.0);
@@ -362,6 +375,9 @@
 				return a + ":" + b + ":" + c.toFixed(2);
 			}
 
+            /* From an array of objects (data), get the one with "name" property
+             * equal to "str", and format a string with his "value" as a        
+             * declination representation */  
 			function getDecVal(str, data) {
 				var value = getElemVal(str, data);
 				var sign = "";
@@ -375,9 +391,11 @@
 
 				return sign + a + ":" + b + ":" + c.toFixed(2);
 			}
+
 			$(document).ready(function() {
 				console.log(scamp_data);
 
+				/* build status string */
 				$('#soft').text(getElemVal("Name", scamp_data.Software)+" "+getElemVal("Version", scamp_data.Software));
 				$('#date').text(getElemVal("Date", scamp_data.Software));
 				$('#time').text(getElemVal("Time", scamp_data.Software));
@@ -386,6 +404,7 @@
 				$('#username').text(getElemVal("User", scamp_data.Software));
 				$('#rundir').text(getElemVal("Path", scamp_data.Software));
 
+				/* show/hide match option and plots */
 				var showmatch = getElemVal("MATCH", scamp_data.Configuration);
 				var showplot  = getElemVal("CHECK_PLOT_DEV");
 				showplot = (showplot > "PNG" || showplot > "PNG" ) ? false : true;
@@ -631,7 +650,8 @@
 					$('#groupsTable td:nth-child(33)').hide();
 					$('#groupsTable th:nth-child(47)').hide();
 					$('#groupsTable td:nth-child(47)').hide();
-				
+                    $('#astrometricInstrumentsTable th:nth-child(6)').hide();   
+                    $('#astrometricInstrumentsTable td:nth-child(6)').hide();  
 				}
 				
 				if (scamp_data.Warnings.length == 0) {
