@@ -80,7 +80,7 @@
 				</div> <!-- col-md3 -->
 
 				<div class="col-xs-12 col-sm-6 col-md-9">
-					<div class="alert alert-warning">
+					<div id ="warningDiv" class="alert alert-warning">
 						<h3>Warnings</h3>
 						<table id="warningsTable" class="table table-responsive table-striped">
 							<thead>
@@ -352,7 +352,6 @@
 			function buildDegreeVal(value) {
 				if (value < 0)
 					value = 0 - value;
-				
 			}
 
 			function getRaVal(str, data) {
@@ -376,7 +375,6 @@
 
 				return sign + a + ":" + b + ":" + c.toFixed(2);
 			}
-
 			$(document).ready(function() {
 				console.log(scamp_data);
 
@@ -441,6 +439,13 @@
 				});
 
 
+				function generateImageCol(imageUrl) {
+					value = "";
+					value += "<td><a type='button' rel='popover' data-img='"+imageUrl+"'>";
+					value += "<img width='100' src='"+imageUrl+"' />";
+					value += "</a></td>";
+					return value;
+				}
 				/* 
 				 * build fields groups table 
 				 */
@@ -449,7 +454,7 @@
 					table_row += "<tr>";
 					table_row += "<td>" +  getElemVal("Name", group) + "</td>";
 					if (showplot) {
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("FgroupsPlot", group) + "\"></td>";
+						table_row += generateImageCol(getElemVal("FgroupsPlot", group));
 					} else {
 						table_row += "<td></td>";
 					}
@@ -462,7 +467,7 @@
 					table_row += "<td>" +  getElemVal("AstRef_Catalog", group) + "</td>";
 					table_row += "<td>" +  getElemVal("AstRef_Band", group) + "</td>";
 					if (showplot) {
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("Chi2Plot", group) + "\"></td>";
+						table_row += generateImageCol(getElemVal("Chi2Plot", group));
 					} else {
 						table_row += "<td></td>";
 					}
@@ -475,8 +480,8 @@
 					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Internal_HighSN", group) + "</td>";
 					if (showplot) {
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr1DimPlot", group) + "\"></td>";
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("IntErr2DimPlot", group) + "\"></td>";
+						table_row += generateImageCol(getElemVal("IntErr1DimPlot", group));
+						table_row += generateImageCol(getElemVal("IntErr2DimPlot", group));
 					} else {
 						table_row += "<td></td>";
 						table_row += "<td></td>";
@@ -492,8 +497,8 @@
 					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group).toFixed(1) + "</td>";
 					table_row += "<td>" +  getElemVal("AstromNDets_Reference_HighSN", group) + "</td>";
 					if (showplot) {
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr1DimPlot", group) + "\"></td>";
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("RefErr2DimPlot", group) + "\"></td>";
+						table_row += generateImageCol(getElemVal("RefErr1DimPlot", group));
+						table_row += generateImageCol(getElemVal("RefErr2DimPlot", group));
 					} else {
 						table_row += "<td></td>";
 						table_row += "<td></td>";
@@ -512,7 +517,7 @@
 					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference_HighSN", " ", 6, group) + "</td>";
 					table_row += "<td>" +  getElemListVal("PhotNDets_Reference_HighSN", " ", group) + "</td>";
 					if (showplot) {
-						table_row += "<td><img width=\"42\" src=\"" +  getElemVal("PhotErrPlot", group) + "\"></td>";
+						table_row += generateImageCol(getElemVal("PhotErrPlot", group));
 					} else {
 						table_row += "<td></td>";
 					}
@@ -533,7 +538,11 @@
 					table_row += "<td>" +  getElemVal("NFields", astroinstru) + "</td>";
 					table_row += "<td>" +  getElemVal("NKeys", astroinstru) + "</td>";
 					table_row += "<td>" +  getElemListVal("Keys", " ", astroinstru) + "</td>";
-					table_row += "<td><img width=\"42\" src=\"" +  getElemVal("DistPlot", astroinstru) + "\"></td>";
+					if (showplot) {
+						table_row += generateImageCol(getElemVal("DistPlot", astroinstru));
+					} else {
+						table_row += "<td></td>";
+					}
 					table_row += "</tr>";
 					$(table_row).appendTo("#astrometricInstrumentsTable tbody");
 				});
@@ -624,6 +633,13 @@
 					$('#groupsTable td:nth-child(47)').hide();
 				
 				}
+				
+				if (scamp_data.Warnings.length == 0) {
+					$("#warningDiv").hide();
+				}	
+				$('a[rel=popover]').popover({
+					animation: true, container: "body", html: true, placement: 'bottom', content: function() {return "<img src='"+$(this).data('img') + "' />";}
+				});
 				
 			});
 		</script>
