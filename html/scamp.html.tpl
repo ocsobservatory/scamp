@@ -2,28 +2,18 @@
 <html>
 	<head>
 		<title>Processing Summary</title>
-		<link rel="stylesheet" 
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
-			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+		<link 
+			rel="stylesheet" 
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+			integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
 			crossorigin="anonymous">
-		<link rel="stylesheet" href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
+		<link 
+			rel="stylesheet" 
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+			integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+			crossorigin="anonymous">
+
 	    <style type="text/css">
-      		body {
-        		padding-top: 60px;
-        		padding-bottom: 40px;
-      		}
-      		.sidebar-nav {
-        		padding: 9px 0;
-      		}
-		
-      		@media (max-width: 980px) {
-        		/* Enable use of floated navbar text */
-        		.navbar-text.pull-right {
-          			float: none;
-          			padding-left: 5px;
-          			padding-right: 5px;
-        		}
-      		}
 			@-ms-viewport     { width: device-width; }
 			@-o-viewport      { width: device-width; }
 			@viewport         { width: device-width; }
@@ -36,177 +26,241 @@
 	</head>
 	<body>
 
-		<div id="cont" class="container" role="main">
-		<h1>Processing summary</h1>
-		<div class="alert alert-success">
-		<strong><span id="soft"></span></strong> completed on <strong><span id="date"></span></strong>
-			at <strong><span id="time"></span></strong> using <strong><span id="nthreads"></span> </strong>
-			threads (run time: <strong><span id="runtime"></span></strong>)
-			started by user <strong><span id="username"></span></strong> in <strong><span id="rundir"></span></strong>.
-		</div>
-
-		<div class="card">
-			<div class="card-header text-center"><h2>Summary Table on Input Files</h2></div>
-			<div class="card-body table-responsive">
-				<table id="fieldsTable" class="table table-hover table-bordered table-striped">
-			    	<thead>
-					</tr>
-					<th>#</th>
-					<th>Filename</th>
-					<th>Identifier</th>
-					<th>Next</th>
-					<th>Ndet</th>
-					<th>Flags</th>
-					<th>G</th>
-					<th>A</th>
-					<th>P</th>
-					<th>Date</th>
-					<th>Exposure Time</th>
-					<th>Air Mass</th>
-					<th>Right Ascension</th>
-					<th>Declination</th>
-					<th>Radius</th>
-					<th>Pixel scale</th>
-					<th class="showmatch">&#916;Pixel scale</th>
-					<th class="showmatch">&#916;Position Angle</th>
-					<th class="showmatch">A/S contrast</th>
-					<th class="showmatch">&#916;X</th>
-					<th class="showmatch">&#916;Y</th>
-					<th class="showmatch">X/Y contrast</th>
-				    <th>&#967;2int</th>
-					<th>&#967;2int High S/N</th>
-					<th>&#967;2ref</th>
-					<th>&#967;2ref High S/N</th>
-					<th>Mag &#916;SP</th>
-					</tr>
-			    	</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div> <!--card-body-->
-		</div> <!--card -->
-
-		<div class="card">
-			<div class="card-header text-center"><h2>Group Properties</h2></div>
-			<div class="card-body table-responsive">
-		<table id="groupsTable" class="table table-bordered table-striped">
-			<thead>
-				<tr>
-					<th>Group name</th>
-					<th class="showplot">Group Plot</th>
-					<th>Index</th>
-					<th>NFields</th>
-					<th>Right Ascension</th>
-					<th>Declination</th>
-					<th>Pixel scale</th>
-					<th>Maximum radius</th>
-					<th>Astrom. Ref. Catalog</th>
-					<th>Astrom. Ref. Band</th>
-					<th class="showplot">&#967;2 Plot</th>
-					<th>Astrom. &#963;int</th>
-					<th>Astrom. &#961;int</th>
-					<th>Astrom. &#967;2int</th>
-					<th>Astrom. N2int</th>
-					<th>Astrom. &#963;int High S/N</th>
-					<th>Astrom. &#961;int High S/N</th>
-					<th>Astrom. &#947;2int High S/N</th>
-					<th>Astrom. N2int High S/N</th>
-					<th class="showplot">Astrom. 1-D Int. Error Plot</th>
-					<th class="showplot">Astrom. 2-D Int. Error Plot</th>
-					<th>Astrom. &#916;RA ref, &#916; DEC ref</th>
-					<th>Astrom. &#963;ref</th>
-					<th>Astrom. &#961;ref</th>
-					<th>Astrom. &#967;2ref</th>
-					<th>Astrom. Nref</th>
-					<th>Astrom. &#916;RA ref, &#916; DEC ref High S/N</th>
-					<th>Astrom. &#963;ref High S/N</th>
-					<th>Astrom. &#961;ref High S/N</th>
-					<th>Astrom. &#947;2ref High S/N</th>
-					<th>Astrom. Nref High S/N</th>
-					<th class="showplot">Astrom. 1-D Ref. Error Plot</th>
-					<th class="showplot">Astrom. 2-D Ref. Error Plot</th>
-					<th>Photom. instruments</th>
-					<th>Photom. &#963;int</th>
-					<th>Photom. &#967;2int</th>
-					<th>Photom. Nint</th>
-					<th>Photom. &#963; High S/N</th>
-					<th>Astrom. &#947;2int High S/N</th>
-					<th>Photom. Nint High S/N</th>
-					<th>Photom. &#963;ref</th>
-					<th>Photom. &#967;2ref</th>
-					<th>Photom. Nref</th>
-					<th>Photom. &#963;ref High S/N</th>
-					<th>Photom. &#947;2ref High S/N</th>
-					<th>Photom. Nref High S/N</th>
-					<th class="showplot">Photom. Internal Error Plot</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-			</div> <!--card-body-->
-		</div> <!--card -->
-
-		<h2>Astrometric Instruments</h2>
-		<table id="astrometricInstrumentsTable" class="table table-responsive table-striped" >
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Index</th>
-					<th>NFields</th>
-					<th>Number of Keywords</th>
-					<th>Keywords</th>
-					<th class="showplot">Distortion Plot</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-
-		<h2>Photometric Instruments</h2>
-		<table id="photometricInstrumentsTable" class="table t table-responsive table-striped">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Index</th>
-					<th>NFields</th>
-					<th>Output ZP</th>
-					<th>Number of Keywords</th>
-					<th>Keywords</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-
-		<h2>Configuration file</h2>
-		<table id="configTable" class="table t table-responsive table-striped">
-			<thead>
-				<tr>
-					<th>Config Parameter</th>
-					<th>Value</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-
-		<h2>Warnings</h2>
-		<table id="warningsTable" class="table table-responsive table-striped">
-			<thead>
-				<tr>
-					<th>Date</th>
-					<th>Time</th>
-					<th>Message</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		</div> <!-- #cont -->
-		<!-- END HTML -->
 
 
+
+		<nav class="navbar navbar-inverse " role="navigation">
+      		<div class="container-fluid">
+        		<div class="navbar-header">
+          			<a 
+						style="padding-top:4px;" 
+						class="navbar-brand" 
+						target="_blank" href="http://astromatic.net">
+							<img 
+								style="height: 50px; margin-top:0px;" 
+								alt="astromatic" 
+								src="http://astromatic.net/xsl/astromatic.png">
+					</a>
+				</div>
+
+				<div class="nav navbar-nav navbar-right">
+					<p class="navbar-text pull-right">
+						<strong>
+							<a target="_blank" 
+								href="https://github.com/astromatic/scamp">
+									<span id="soft" 
+										class="label label-primary" 
+										style="font-size:50;"></span>
+							</a>
+						</strong> 
+						completed on <strong><span id="date"></span></strong>
+						at <strong><span id="time"></span></strong> 
+						using <strong><span id="nthreads"></span> </strong>
+						threads (run time: <strong><span id="runtime"></span></strong>)
+						started by user <strong><span id="username"></span></strong> 
+						in <strong><span id="rundir"></span></strong>.
+					</p>
+        		</div> <!-- navright -->
+      		</div> <!--container-fluid-->
+    	</nav> <!-- nav -->
+
+
+
+
+		<div class="container-fluid role="main"">
+			<div class="row-fluid">
+				<div class="col-xs-0 col-sm-6 col-md-3">
+					<div class="list-group">
+						<a href="#inputFiles" class="list-group-item">Input files</a>
+						<a href="#groupProperties" class="list-group-item">Group properties</a>
+						<a href="#astroInstru" class="list-group-item">Astrometric Instruments</a>
+						<a href="#photoInstru" class="list-group-item">Photometric Instruments</a>
+						<a href="#configFile" class="list-group-item">Configuration file</a>
+					</div>
+				</div> <!-- col-md3 -->
+
+				<div class="col-xs-12 col-sm-6 col-md-9">
+					<div class="alert alert-warning">
+						<h3>Warnings</h3>
+						<table id="warningsTable" class="table table-responsive table-striped">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Time</th>
+									<th>Message</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div> <!--alert -->
+
+					<div id="inputFiles" class="panel panel-default">
+						<div class="panel-heading text-center">Summary Table on Input Files</div>
+						<div class="panel-body table-responsive">
+							<table id="fieldsTable" class="table table-hover table-bordered table-striped">
+			    				<thead>
+									<tr>
+										<th>#</th>
+										<th>Filename</th>
+										<th>Identifier</th>
+										<th>Next</th>
+										<th>Ndet</th>
+										<th>Flags</th>
+										<th>G</th>
+										<th>A</th>
+										<th>P</th>
+										<th>Date</th>
+										<th>Exposure Time</th>
+										<th>Air Mass</th>
+										<th>Right Ascension</th>
+										<th>Declination</th>
+										<th>Radius</th>
+										<th>Pixel scale</th>
+										<th class="showmatch">&#916;Pixel scale</th>
+										<th class="showmatch">&#916;Position Angle</th>
+										<th class="showmatch">A/S contrast</th>
+										<th class="showmatch">&#916;X</th>
+										<th class="showmatch">&#916;Y</th>
+										<th class="showmatch">X/Y contrast</th>
+				    					<th>&#967;2int</th>
+										<th>&#967;2int High S/N</th>
+										<th>&#967;2ref</th>
+										<th>&#967;2ref High S/N</th>
+										<th>Mag &#916;SP</th>
+									</tr>
+			    				</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div> <!--panel-body-->
+				</div> <!--panel -->
+
+				<div id="groupProperties" class="panel panel-default">
+					<div class="panel-heading text-center">Group Properties</div>
+					<div class="panel-body table-responsive">
+						<table id="groupsTable" class="table table-bordered table-striped">
+							<thead>
+								<tr>
+									<th>Group name</th>
+									<th class="showplot">Group Plot</th>
+									<th>Index</th>
+									<th>NFields</th>
+									<th>Right Ascension</th>
+									<th>Declination</th>
+									<th>Pixel scale</th>
+									<th>Maximum radius</th>
+									<th>Astrom. Ref. Catalog</th>
+									<th>Astrom. Ref. Band</th>
+									<th class="showplot">&#967;2 Plot</th>
+									<th>Astrom. &#963;int</th>
+									<th>Astrom. &#961;int</th>
+									<th>Astrom. &#967;2int</th>
+									<th>Astrom. N2int</th>
+									<th>Astrom. &#963;int High S/N</th>
+									<th>Astrom. &#961;int High S/N</th>
+									<th>Astrom. &#947;2int High S/N</th>
+									<th>Astrom. N2int High S/N</th>
+									<th class="showplot">Astrom. 1-D Int. Error Plot</th>
+									<th class="showplot">Astrom. 2-D Int. Error Plot</th>
+									<th>Astrom. &#916;RA ref, &#916; DEC ref</th>
+									<th>Astrom. &#963;ref</th>
+									<th>Astrom. &#961;ref</th>
+									<th>Astrom. &#967;2ref</th>
+									<th>Astrom. Nref</th>
+									<th>Astrom. &#916;RA ref, &#916; DEC ref High S/N</th>
+									<th>Astrom. &#963;ref High S/N</th>
+									<th>Astrom. &#961;ref High S/N</th>
+									<th>Astrom. &#947;2ref High S/N</th>
+									<th>Astrom. Nref High S/N</th>
+									<th class="showplot">Astrom. 1-D Ref. Error Plot</th>
+									<th class="showplot">Astrom. 2-D Ref. Error Plot</th>
+									<th>Photom. instruments</th>
+									<th>Photom. &#963;int</th>
+									<th>Photom. &#967;2int</th>
+									<th>Photom. Nint</th>
+									<th>Photom. &#963; High S/N</th>
+									<th>Astrom. &#947;2int High S/N</th>
+									<th>Photom. Nint High S/N</th>
+									<th>Photom. &#963;ref</th>
+									<th>Photom. &#967;2ref</th>
+									<th>Photom. Nref</th>
+									<th>Photom. &#963;ref High S/N</th>
+									<th>Photom. &#947;2ref High S/N</th>
+									<th>Photom. Nref High S/N</th>
+									<th class="showplot">Photom. Internal Error Plot</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div> <!--panel-body-->
+				</div> <!--panel -->
+
+				<div class="row">
+					<div class="col-md-6"> 
+						<div id="astroInstruments" class="panel panel-default">
+							<div class="panel-heading text-center">Astrometric Instruments</div>
+							<div class="panel-body table-responsive">
+								<table id="astrometricInstrumentsTable" class="table table-striped" >
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Index</th>
+											<th>NFields</th>
+											<th>Number of Keywords</th>
+											<th>Keywords</th>
+											<th class="showplot">Distortion Plot</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div> <!--panel-body-->
+						</div> <!--panel -->
+					</div>
+		
+					<div class="col-md-6"> 
+						<div id="photoInstruments" class="panel panel-default">
+							<div class="panel-heading text-center">Photometric Instruments</div>
+							<div class="panel-body table-responsive">
+		
+								<table id="photometricInstrumentsTable" class="table t table-striped">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Index</th>
+											<th>NFields</th>
+											<th>Output ZP</th>
+											<th>Number of Keywords</th>
+											<th>Keywords</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div> <!--panel-body-->
+						</div> <!--panel -->
+					</div>
+				</div>
+
+				<div id="configFile" class="panel panel-default">
+					<div class="panel-heading text-center">Configuration File</div>
+					<div class="panel-body table-responsive">
+						<table id="configTable" class="table t table-responsive table-striped">
+							<thead>
+								<tr>
+									<th>Config Parameter</th>
+									<th>Value</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div> <!--panel-body-->
+				</div> <!--panel -->
+			</div> <!-- row -->
+		</div> <!--container-->
 
 
 
@@ -216,11 +270,8 @@
 			integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
 			crossorigin="anonymous"></script>
 		<script 
-			src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" 
-			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" 
-			crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
-			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
 			crossorigin="anonymous"></script>
 		<script>
 			/*! 
