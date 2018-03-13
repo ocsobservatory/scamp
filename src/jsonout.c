@@ -1,7 +1,34 @@
 /*
+ *               jsonout.c
+ *
  * Generate scamp metadata report output
  *
- */
+ *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ *
+ *   This file part of:  SCAMP
+ *
+ *   Copyright:      (C) 2002-2018 Emmanuel Bertin -- IAP/CNRS/UPMC
+ *
+ *   License:        GNU General Public License
+ *
+ *   SCAMP is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *   SCAMP is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *   You should have received a copy of the GNU General Public License
+ *   along with SCAMP. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   Last modified:      13/03/2018
+ *
+ *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+#ifdef HAVE_CONFIG_H
+#include "config"
+#endif /* HAVE_CONFIG_H */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +45,7 @@ static fgroupstruct **json_fgroups;
 static int json_nfields;
 static int json_nfgroups;
 
+/** DOC: see jsonout.h */
 void
 JsonOut_set_data(
         fieldstruct  **fields,
@@ -32,6 +60,18 @@ JsonOut_set_data(
     json_nfgroups = nfgroups;
 }
 
+/****** new_json_object *******************************************************
+  PROTO static json_object* new_json_object(char*,char*,char*,char*)
+  PURPOSE Helper to create common object used for json output.
+  INPUT the name of the object (any string)
+  INPUT the type of object (string|string array|int|int array|double|double array)
+  INPUT the ucd (any string)
+  INPUT the unit (any string, or NULL)
+  OUTPUT a new json object
+  NOTES object is dealocated by his object container.
+  AUTHOR    E. Bertin (IAP)
+  VERSION   13/03/2018
+ ***/
 static json_object*
 new_json_object(
         char *name,
@@ -49,6 +89,9 @@ new_json_object(
     return o;
 }
 
+/**
+ * These data and function are used to mimic the original xml.c code logic.
+ */ 
 #ifdef HAVE_PLPLOT
 static char *plplot_astrinst_names[] = {
     "DistPlot",
@@ -58,6 +101,16 @@ static char *plplot_astrinst_names[] = {
     "ShearPlot"
 };
 static cplotenum next_astrinst_plot = CPLOT_DISTORT;
+/******  get_next_astrinst_plot ***********************************************
+  PROTO static int get_next_astrinst_plot(char**)
+  PURPOSE Helper to iterate plots in the good order.
+  INPUT a pointer to a char array
+  OUTPUT the pointer will contain the name of the plot.
+  NOTES This is done to exactly mimic the original algorythm that build the xml
+  output.
+  AUTHOR    E. Bertin (IAP)
+  VERSION   13/03/2018
+ ***/
 static int
 get_next_astrinst_plot(char**name) {
     int index;
@@ -123,6 +176,16 @@ static char *plplot_fgroup_names[] = {
     "RefPropPlot"
 };
 static cplotenum next_fgroup_plot = CPLOT_FGROUPS;
+/******  get_next_fgroup_plot *************************************************
+  PROTO static int get_next_fgroup_plot(char**)
+  PURPOSE Helper to iterate plots in the good order.
+  INPUT a pointer to a char array
+  OUTPUT the pointer will contain the name of the plot.
+  NOTES This is done to exactly mimic the original algorythm that build the xml
+  output.
+  AUTHOR    E. Bertin (IAP)
+  VERSION   13/03/2018
+ ***/
 static int
 get_next_fgroup_plot(char**name) {
     int index;
@@ -230,6 +293,7 @@ get_next_fgroup_plot(char**name) {
 }
 #endif /* HAVE_PLPLOT */
 
+/** DOC: see jsonout.h */
 void
 JsonOut_write()
 {
