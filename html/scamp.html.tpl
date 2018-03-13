@@ -406,7 +406,7 @@
 
 				/* show/hide match option and plots */
 				var showmatch = getElemVal("MATCH", scamp_data.Configuration);
-				var showplot  = getElemVal("CHECK_PLOT_DEV");
+				var showplot  = getElemVal("CHECK_PLOT_DEV", scamp_data.Configuration);
 				showplot = (showplot > "PNG" || showplot > "PNG" ) ? false : true;
 
 				/* 
