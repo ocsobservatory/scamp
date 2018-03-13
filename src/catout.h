@@ -36,7 +36,7 @@
 /*--------------------------------- typedefs --------------------------------*/
 
 typedef enum {CAT_NONE, CAT_ASCII_HEAD, CAT_ASCII, CAT_ASCII_SKYCAT,
-		CAT_ASCII_VOTABLE, CAT_FITS_LDAC} cattypenum;
+		CAT_FITS_LDAC} cattypenum;
 
 /*--------------------------- structure definitions -------------------------*/
 typedef struct mergedsample
@@ -97,7 +97,6 @@ typedef struct fullsample
 /*-------------------------------- protos -----------------------------------*/
 
 void		writefullcat_fgroup(char *filename, fgroupstruct *fgroup),
-		writemergedcat_fgroup(char *filename, fgroupstruct *fgroup),
-		write_vo_fields(FILE *file, tabstruct *objtab);
+		writemergedcat_fgroup(char *filename, fgroupstruct *fgroup);
 
 #endif // _CATOUT_H_

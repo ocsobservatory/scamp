@@ -129,8 +129,7 @@ void	writemergedcat_fgroup(char *filename, fgroupstruct *fgroup)
     /* Create a new output catalog */
     if (prefs.mergedcat_type == CAT_ASCII_HEAD
             || prefs.mergedcat_type == CAT_ASCII
-            || prefs.mergedcat_type == CAT_ASCII_SKYCAT
-            || prefs.mergedcat_type == CAT_ASCII_VOTABLE)
+            || prefs.mergedcat_type == CAT_ASCII_SKYCAT)
     {
         cat = NULL;
         if (prefs.mergedcatpipe_flag)
@@ -164,24 +163,6 @@ void	writemergedcat_fgroup(char *filename, fgroupstruct *fgroup)
                 strcpy(key->printf, str);
             }
             fprintf(ascfile, "\n------------------\n");
-        }
-        else if (prefs.mergedcat_type == CAT_ASCII_VOTABLE && objtab->key) 
-        {
-            /*---- A short, "relative" version of the filename */
-            if (!(rfilename = strrchr(filename, '/')))
-                rfilename = filename;
-            else
-                rfilename++;
-            //write_xml_header(ascfile);
-            fprintf(ascfile,
-                    " <TABLE ID=\"Merged_List\" name=\"%s/out\">\n", rfilename);
-            fprintf(ascfile,
-                    "  <DESCRIPTION>Table of detections merged by %s</DESCRIPTION>\n",
-                    BANNER);
-            fprintf(ascfile,
-                    "  <!-- Now comes the definition of each %s parameter -->\n", BANNER);
-            write_vo_fields(ascfile, objtab);
-            fprintf(ascfile, "   <DATA><TABLEDATA>\n");
         }
     }
     else
@@ -307,8 +288,6 @@ void	writemergedcat_fgroup(char *filename, fgroupstruct *fgroup)
                 || prefs.mergedcat_type == CAT_ASCII
                 || prefs.mergedcat_type == CAT_ASCII_SKYCAT)
             print_obj(ascfile, objtab);
-        else if (prefs.mergedcat_type == CAT_ASCII_VOTABLE)
-            voprint_obj(ascfile, objtab);
         else
             write_obj(objtab, buf);
     }
@@ -321,15 +300,6 @@ void	writemergedcat_fgroup(char *filename, fgroupstruct *fgroup)
             fprintf(ascfile, skycattail);
         if (!prefs.mergedcatpipe_flag)
             fclose(ascfile);
-    }
-    else if (prefs.mergedcat_type == CAT_ASCII_VOTABLE)
-    {
-        fprintf(ascfile, "    </TABLEDATA></DATA>\n");
-        fprintf(ascfile, "  </TABLE>\n");
-        /*-- Add configuration file meta-data */
-        //write_xml_meta(ascfile, NULL);
-        fprintf(ascfile, "</RESOURCE>\n");
-        fprintf(ascfile, "</VOTABLE>\n");
     }
     else
         end_writeobj(cat, objtab, buf);
@@ -410,8 +380,7 @@ void	writefullcat_fgroup(char *filename, fgroupstruct *fgroup)
     /* Create a new output catalog */
     if (prefs.fullcat_type == CAT_ASCII_HEAD
             || prefs.fullcat_type == CAT_ASCII
-            || prefs.fullcat_type == CAT_ASCII_SKYCAT
-            || prefs.fullcat_type == CAT_ASCII_VOTABLE)
+            || prefs.fullcat_type == CAT_ASCII_SKYCAT)
     {
         cat = NULL;
         if (prefs.fullcatpipe_flag)
@@ -445,24 +414,6 @@ void	writefullcat_fgroup(char *filename, fgroupstruct *fgroup)
                 strcpy(key->printf, str);
             }
             fprintf(ascfile, "\n------------------\n");
-        }
-        else if (prefs.fullcat_type == CAT_ASCII_VOTABLE && objtab->key) 
-        {
-            /*---- A short, "relative" version of the filename */
-            if (!(rfilename = strrchr(filename, '/')))
-                rfilename = filename;
-            else
-                rfilename++;
-            //write_xml_header(ascfile);
-            fprintf(ascfile,
-                    " <TABLE ID=\"Full_List\" name=\"%s/out\">\n", rfilename);
-            fprintf(ascfile,
-                    "  <DESCRIPTION>Table of all detections by %s</DESCRIPTION>\n",
-                    BANNER);
-            fprintf(ascfile,
-                    "  <!-- Now comes the definition of each %s parameter -->\n", BANNER);
-            write_vo_fields(ascfile, objtab);
-            fprintf(ascfile, "   <DATA><TABLEDATA>\n");
         }
     }
     else
@@ -548,8 +499,6 @@ void	writefullcat_fgroup(char *filename, fgroupstruct *fgroup)
                     || prefs.fullcat_type == CAT_ASCII
                     || prefs.fullcat_type == CAT_ASCII_SKYCAT)
                 print_obj(ascfile, objtab);
-            else if (prefs.fullcat_type == CAT_ASCII_VOTABLE)
-                voprint_obj(ascfile, objtab);
             else
                 write_obj(objtab, buf);
         }
@@ -564,15 +513,6 @@ void	writefullcat_fgroup(char *filename, fgroupstruct *fgroup)
         if (!prefs.fullcatpipe_flag)
             fclose(ascfile);
     }
-    else if (prefs.fullcat_type == CAT_ASCII_VOTABLE)
-    {
-        fprintf(ascfile, "    </TABLEDATA></DATA>\n");
-        fprintf(ascfile, "  </TABLE>\n");
-        /*-- Add configuration file meta-data */
-        //write_xml_meta(ascfile, NULL);
-        fprintf(ascfile, "</RESOURCE>\n");
-        fprintf(ascfile, "</VOTABLE>\n");
-    }
     else
         end_writeobj(cat, objtab, buf);
 
@@ -586,60 +526,4 @@ void	writefullcat_fgroup(char *filename, fgroupstruct *fgroup)
 
     return;
 }
-
-
-/****** write_vo_fields *******************************************************
-  PROTO	void	write_vo_fields(FILE *file, tabstruct *objtab)
-  PURPOSE	Write the list of columns to an XML-VOTable file or stream
-  INPUT	Pointer to the output file (or stream),
-  Pointer to the object table.
-  OUTPUT	-.
-  NOTES	-.
-  AUTHOR	E. Bertin (IAP)
-  VERSION	19/10/2009
- ***/
-void	write_vo_fields(FILE *file, tabstruct *objtab)
-{
-    keystruct	*key;
-    char		datatype[40], arraysize[40], str[40];
-    int		i, d;
-
-    if (!objtab || !objtab->key)
-        return;
-    key=objtab->key;
-    for (i=0; i++<objtab->nkey; key=key->nextkey)
-    {
-        /*--- indicate datatype, arraysize, width and precision attributes */
-        /*--- Handle multidimensional arrays */
-        arraysize[0] = '\0';
-        if (key->naxis>1)
-        {
-            for (d=0; d<key->naxis; d++)
-            {
-                sprintf(str, "%s%d", d?"x":" arraysize=\"", key->naxisn[d]);
-                strcat(arraysize, str);
-            }
-            strcat(arraysize, "\"");
-        }
-        switch(key->ttype)
-        {
-            case T_BYTE:	strcpy(datatype, "unsignedByte"); break;
-            case T_SHORT:	strcpy(datatype, "short"); break;
-            case T_LONG:	strcpy(datatype, "int"); break;
-            case T_FLOAT:	strcpy(datatype, "float"); break;
-            case T_DOUBLE:	strcpy(datatype, "double"); break;
-            default:		error(EXIT_FAILURE,
-                                    "*Internal Error*: Unknown datatype in ",
-                                    "initcat()");
-        }
-        fprintf(file,
-                "  <FIELD name=\"%s\" ucd=\"%s\" datatype=\"%s\" unit=\"%s\"%s>\n",
-                key->name, key->voucd, datatype,key->vounit, arraysize);
-        fprintf(file, "   <DESCRIPTION>%s</DESCRIPTION>\n", key->comment);
-        fprintf(file, "  </FIELD>\n");
-    }
-
-    return;
-}
-
 
