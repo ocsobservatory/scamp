@@ -246,7 +246,7 @@ the executable as portable as possible (default = no)])],
 	AC_MSG_RESULT([yes]),
 	AC_MSG_RESULT([no]))
 
-PKG_CHECK_MODULES(JSON, json-c12)
+PKG_CHECK_MODULES(JSON, json-c)
 
 ################# Actions to complete in case of multhreading ################
 AC_DEFINE_UNQUOTED(THREADS_NMAX, $n_pthreads,[Maximum number of POSIX threads])
