@@ -322,36 +322,25 @@
 				return value;
 			}
 
-            /* From an array of object (data), take the one having "str" as        
-             * "name" property, and return his "value" or "-". Used                
-             * for flag column in field table */  
-			function getFlagVal(str, t, data) {
-				if (getElemVal(str, data))
+			function getFlagValHelper(b, t) {
+				if (b)
 					return t;
 				return "-";
 			}
 
-            /* From an array of object, take the one aving "str" as property       
-             * "name", add values (wich must be an array of numbers), and          
-             * return his average */  
-			function getElemAverageVal(str, data) {
+			function getElemAverageValHelper(a) {
 				var value = 0.0;
 				var n = 0;
-				$.each(getElemVal(str, data), function(i, elem) {
+				$.each(a, function(i, elem) {
 					value += elem;
 					n++;
 				});
 				return value / n;
 			}
 
-            /* From an array of object (data), take the one with "name" property
-             * equal to "str", and return a formated string with numbers        
-             * floating precision defined by "fix", and unit by "unit".         
-             * Of course, the object "value" must be an array of numbers.       
-             * Setting fix to negative value, do note limit precision. */ 
-			function getElemListValFixed(str, unit, fix, data) {
+			function getElemListValHelperFixedHelper(arr, unit, fix) {
 				var value = "";
-				$.each(getElemVal(str, data), function(i, elem) {
+				$.each(arr, function(i, elem) {
 					if (fix >= 0) {
 						elem = elem.toFixed(fix);
 					}
@@ -360,26 +349,18 @@
 				return value;
 			}
 
-			function getElemListVal(str, unit, data) {
-				return getElemListValFixed(str, unit, -1, data);
+			function getElemListValHelper(arr, unit) {
+				return getElemListValHelperFixedHelper(arr, unit, -1);
 			}
 
-            /* From an array of objects (data), get the one with "name" property
-             * equal to "str", and format a string with his "value" as a        
-             * right ascention representation */
-			function getRaVal(str, data) {
-				var value = getElemVal(str, data);
+			function getRaValHelper(value) {
 				var a = Math.floor(value[0] / 15.0);
 				var b = Math.floor((value[0] * 4) % 60);
 				var c = Math.floor((value[0] *240) % 60);
 				return a + ":" + b + ":" + c.toFixed(2);
 			}
 
-            /* From an array of objects (data), get the one with "name" property
-             * equal to "str", and format a string with his "value" as a        
-             * declination representation */  
-			function getDecVal(str, data) {
-				var value = getElemVal(str, data);
+			function getDecValHelper(value) {
 				var sign = "";
 				if (value[1] < 0) {
 					sign = "-";
@@ -396,13 +377,13 @@
 				console.log(scamp_data);
 
 				/* build status string */
-				$('#soft').text(getElemVal("Name", scamp_data.Software)+" "+getElemVal("Version", scamp_data.Software));
-				$('#date').text(getElemVal("Date", scamp_data.Software));
-				$('#time').text(getElemVal("Time", scamp_data.Software));
-				$('#nthreads').text(getElemVal("NThreads", scamp_data.Software));
-				$('#runtime').text(getElemVal("Duration", scamp_data.Software) + " s");
-				$('#username').text(getElemVal("User", scamp_data.Software));
-				$('#rundir').text(getElemVal("Path", scamp_data.Software));
+				$('#soft').text(scamp_data.Software.Name.value +" "+scamp_data.Software.Version.value);
+				$('#date').text(scamp_data.Software.Date.value);
+				$('#time').text(scamp_data.Software.Time.value);
+				$('#nthreads').text(scamp_data.Software.NThreads.value);
+				$('#runtime').text(scamp_data.Software.Duration.value + " s");
+				$('#username').text(scamp_data.Software.User.value);
+				$('#rundir').text(scamp_data.Software.Path.value);
 
 				/* show/hide match option and plots */
 				var showmatch = getElemVal("MATCH", scamp_data.Configuration);
@@ -415,30 +396,30 @@
 				$.each(scamp_data.Fields, function(i, field) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  getElemVal("Catalog_Number", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Catalog_Name", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Image_Ident", field) + "</td>";
-					table_row += "<td>" +  getElemVal("NExtensions", field) + "</td>";
-					table_row += "<td>" +  getElemVal("NDetect", field) + "</td>";
-					table_row += "<td>" +  getFlagVal("Ext_Header", "H", field)  + getFlagVal("Photom_Flag", "P", field) +  "</td>";
-					table_row += "<td>" +  getElemVal("Group", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Astr_Instrum", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Phot_Instrum", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Observation_Date", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Exposure_Time", field).toFixed(3) + "</td>";
-					table_row += "<td>" +  getElemVal("Air_Mass", field).toFixed(2) + "</td>";
-					table_row += "<td>" +  getRaVal("Field_Coordinates", field) + "</td>";
-					table_row += "<td>" +  getDecVal("Field_Coordinates", field) + "</td>";
-					table_row += "<td>" +  getElemVal("Max_Radius", field).toFixed(3) + "'" + "</td>";
-					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", field).toFixed(4) + "''" + "</td>";
+					table_row += "<td>" +  field.Catalog_Number.value + "</td>";
+					table_row += "<td>" +  field.Catalog_Name.value + "</td>";
+					table_row += "<td>" +  field.Image_Ident.value + "</td>";
+					table_row += "<td>" +  field.NExtensions.value + "</td>";
+					table_row += "<td>" +  field.NDetect.value + "</td>";
+					table_row += "<td>" +  getFlagValHelper(field.Ext_Header.value, "H")  + getFlagValHelper(field.Photom_Flag, "P") +  "</td>";
+					table_row += "<td>" +  field.Group.value + "</td>";
+					table_row += "<td>" +  field.Astr_Instrum.value + "</td>";
+					table_row += "<td>" +  field.Phot_Instrum.value + "</td>";
+					table_row += "<td>" +  field.Observation_Date.value + "</td>";
+					table_row += "<td>" +  field.Exposure_Time.value.toFixed(3) + "</td>";
+					table_row += "<td>" +  field.Air_Mass.value.toFixed(2) + "</td>";
+					table_row += "<td>" +  getRaValHelper(field.Field_Coordinates.value) + "</td>";
+					table_row += "<td>" +  getDecValHelper(field.Field_Coordinates.value) + "</td>";
+					table_row += "<td>" +  field.Max_Radius.value.toFixed(3) + "'" + "</td>";
+					table_row += "<td>" +  getElemAverageValHelper(field.Pixel_Scale.value).toFixed(4) + "''" + "</td>";
 
 					if (showmatch) {
-						table_row += "<td>" +  getElemVal("DPixel_Scale", field).toFixed(4) + "</td>";
-						table_row += "<td>" +  getElemVal("DPos_Angle", field) + "°" + "</td>";
-						table_row += "<td>" +  getElemVal("AS_Contrast", field).toFixed(1) + "</td>";
-						table_row += "<td>" +  getElemVal("DX", field).toExponential() + "°" + "</td>";
-						table_row += "<td>" +  getElemVal("DY", field).toExponential() + "°" + "</td>";
-						table_row += "<td>" +  getElemVal("XY_Contrast", field).toFixed(1) + "</td>";
+						table_row += "<td>" +  field.DPixel_Scale.value.toFixed(4) + "</td>";
+						table_row += "<td>" +  field.DPos_Angle.value + "°" + "</td>";
+						table_row += "<td>" +  field.AS_Contrast.value.toFixed(1) + "</td>";
+						table_row += "<td>" +  field.DX.value.toExponential() + "°" + "</td>";
+						table_row += "<td>" +  field.DY.value.toExponential() + "°" + "</td>";
+						table_row += "<td>" +  field.XY_Contrast.value.toFixed(1) + "</td>";
 					} else {
 						table_row += "<td></td>";
 						table_row += "<td></td>";
@@ -448,17 +429,17 @@
 						table_row += "<td></td>";
 					}
 
-					table_row += "<td>" +  getElemVal("Chi2_Internal", field).toFixed(2) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Internal_HighSN", field).toFixed(2) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Reference", field).toFixed(2) + "</td>";
-					table_row += "<td>" +  getElemVal("Chi2_Reference_HighSN", field).toFixed(2) + "</td>";
-					table_row += "<td>" +  getElemVal("ZeroPoint_Corr", field).toFixed(3) + "</td>";
+					table_row += "<td>" +  field.Chi2_Internal.value.toFixed(2) + "</td>";
+					table_row += "<td>" +  field.Chi2_Internal_HighSN.value.toFixed(2) + "</td>";
+					table_row += "<td>" +  field.Chi2_Reference.value.toFixed(2) + "</td>";
+					table_row += "<td>" +  field.Chi2_Reference_HighSN.value.toFixed(2) + "</td>";
+					table_row += "<td>" +  field.ZeroPoint_Corr.value.toFixed(3) + "</td>";
 					table_row += "</tr>";
 					$(table_row).appendTo("#fieldsTable tbody");
 				});
 
 
-				function generateImageCol(imageUrl) {
+				function generateImageColHelper(imageUrl) {
 					value = "";
 					value += "<td><a type='button' rel='popover' data-img='"+imageUrl+"'>";
 					value += "<img width='100' src='"+imageUrl+"' />";
@@ -471,72 +452,72 @@
 				$.each(scamp_data.Fgroups, function(i, group) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  getElemVal("Name", group) + "</td>";
+					table_row += "<td>" +  group.Name.value + "</td>";
 					if (showplot) {
-						table_row += generateImageCol(getElemVal("FgroupsPlot", group));
+						table_row += "<td>" + group.FgroupsPlot.value + "</td>";
 					} else {
 						table_row += "<td></td>";
 					}
-					table_row += "<td>" +  getElemVal("Index", group) + "</td>";
-					table_row += "<td>" +  getElemVal("NFields", group) + "</td>";
-					table_row += "<td>" +  getRaVal("Field_Coordinates", group) + "</td>";
-					table_row += "<td>" +  getDecVal("Field_Coordinates", group) + "</td>";
-					table_row += "<td>" +  getElemAverageVal("Pixel_Scale", group).toFixed(4) + "''" + "</td>";
-					table_row += "<td>" +  getElemVal("Max_Radius", group).toFixed(3) + "'" + "</td>";
-					table_row += "<td>" +  getElemVal("AstRef_Catalog", group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstRef_Band", group) + "</td>";
+					table_row += "<td>" +  group.Index.value + "</td>";
+					table_row += "<td>" +  group.NFields.value + "</td>";
+					table_row += "<td>" +  getRaValHelper(group.Field_Coordinates.value) + "</td>";
+					table_row += "<td>" +  getDecValHelper(group.Field_Coordinates.value) + "</td>";
+					table_row += "<td>" +  getElemAverageValHelper(group.Pixel_Scale.value).toFixed(4) + "''" + "</td>";
+					table_row += "<td>" +  group.Max_Radius.value.toFixed(3) + "'" + "</td>";
+					table_row += "<td>" +  group.AstRef_Catalog.value + "</td>";
+					table_row += "<td>" +  group.AstRef_Band.value + "</td>";
 					if (showplot) {
-						table_row += generateImageCol(getElemVal("Chi2Plot", group));
+						table_row += generateImageColHelper(group.Chi2Plot.value);
 					} else {
 						table_row += "<td></td>";
 					}
-					table_row += "<td>" +  getElemListValFixed("AstromSigma_Internal", "'' ", 4, group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Internal", group).toFixed(5) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Internal", group).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromNDets_Internal", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("AstromSigma_Internal_HighSN", "'' ", 4, group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Internal_HighSN", group).toFixed(5)  + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Internal_HighSN", group).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromNDets_Internal_HighSN", group) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromSigma_Internal.value, "'' ", 4) + "</td>";
+					table_row += "<td>" +  group.AstromCorr_Internal.value.toFixed(5) + "</td>";
+					table_row += "<td>" +  group.AstromChi2_Internal.value.toFixed(1) + "</td>";
+					table_row += "<td>" +  group.AstromNDets_Internal.value + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromSigma_Internal_HighSN.value, "'' ", 4) + "</td>";
+					table_row += "<td>" +  group.AstromCorr_Internal_HighSN.value.toFixed(5)  + "</td>";
+					table_row += "<td>" +  group.AstromChi2_Internal_HighSN.value.toFixed(1) + "</td>";
+					table_row += "<td>" +  group.AstromNDets_Internal_HighSN.value + "</td>";
 					if (showplot) {
-						table_row += generateImageCol(getElemVal("IntErr1DimPlot", group));
-						table_row += generateImageCol(getElemVal("IntErr2DimPlot", group));
-					} else {
-						table_row += "<td></td>";
-						table_row += "<td></td>";
-					}
-					table_row += "<td>" +  getElemListValFixed("AstromOffset_Reference", "'' ", 4, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("AstromSigma_Reference", "'' ", 3, group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Reference", group).toFixed(4) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Reference", group).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromNDets_Reference", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("AstromOffset_Reference_HighSN", "'' ", 4, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("AstromSigma_Reference_HighSN", "'' ", 3, group) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromCorr_Reference_HighSN", group).toFixed(4) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromChi2_Reference_HighSN", group).toFixed(1) + "</td>";
-					table_row += "<td>" +  getElemVal("AstromNDets_Reference_HighSN", group) + "</td>";
-					if (showplot) {
-						table_row += generateImageCol(getElemVal("RefErr1DimPlot", group));
-						table_row += generateImageCol(getElemVal("RefErr2DimPlot", group));
+						table_row += generateImageColHelper(group.IntErr1DimPlot.value);
+						table_row += generateImageColHelper(group.IntErr2DimPlot.value);
 					} else {
 						table_row += "<td></td>";
 						table_row += "<td></td>";
 					}
-					table_row += "<td>" +  getElemListVal("PhotInstru_Name",", ", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotSigma_Internal", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotChi2_Internal", " ", 4, group) + "</td>";
-					table_row += "<td>" +  getElemListVal("PhotNDets_Internal", " ", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotSigma_Internal_HighSN", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotChi2_Internal_HighSN", " ", 2, group) + "</td>";
-					table_row += "<td>" +  getElemListVal("PhotNDets_Internal_HighSN", " ", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotSigma_Reference", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListVal("PhotNDets_Reference", " ", group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotSigma_Reference_HighSN", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListValFixed("PhotChi2_Reference_HighSN", " ", 6, group) + "</td>";
-					table_row += "<td>" +  getElemListVal("PhotNDets_Reference_HighSN", " ", group) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromOffset_Reference.value, "'' ", 4) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromSigma_Reference.value, "'' ", 3) + "</td>";
+					table_row += "<td>" +  group.AstromCorr_Reference.value.toFixed(4) + "</td>";
+					table_row += "<td>" +  group.AstromChi2_Reference.value.toFixed(1) + "</td>";
+					table_row += "<td>" +  group.AstromNDets_Reference.value + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromOffset_Reference_HighSN.value, "'' ", 4) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.AstromSigma_Reference_HighSN.value, "'' ", 3) + "</td>";
+					table_row += "<td>" +  group.AstromCorr_Reference_HighSN.value.toFixed(4) + "</td>";
+					table_row += "<td>" +  group.AstromChi2_Reference_HighSN.value.toFixed(1) + "</td>";
+					table_row += "<td>" +  group.AstromNDets_Reference_HighSN.value + "</td>";
 					if (showplot) {
-						table_row += generateImageCol(getElemVal("PhotErrPlot", group));
+						table_row += generateImageColHelper(group.RefErr1DimPlot.value);
+						table_row += generateImageColHelper(group.RefErr2DimPlot.value);
+					} else {
+						table_row += "<td></td>";
+						table_row += "<td></td>";
+					}
+					table_row += "<td>" +  getElemListValHelper(group.PhotInstru_Name.value,", ") + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotSigma_Internal.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotChi2_Internal.value, " ", 4) + "</td>";
+					table_row += "<td>" +  getElemListValHelper(group.PhotNDets_Internal.value, " ") + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotSigma_Internal_HighSN.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotChi2_Internal_HighSN.value, " ", 2) + "</td>";
+					table_row += "<td>" +  getElemListValHelper(group.PhotNDets_Internal_HighSN.value, " ") + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotSigma_Reference.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotChi2_Reference.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelper(group.PhotNDets_Reference.value, " ") + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotSigma_Reference_HighSN.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelperFixedHelper(group.PhotChi2_Reference_HighSN.value, " ", 6) + "</td>";
+					table_row += "<td>" +  getElemListValHelper(group.PhotNDets_Reference_HighSN.value, " ") + "</td>";
+					if (showplot) {
+						table_row += generateImageColHelper(group.PhotErrPlot.value);
 					} else {
 						table_row += "<td></td>";
 					}
@@ -552,13 +533,13 @@
 				$.each(scamp_data.AstroInstruments, function(i, astroinstru) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  getElemVal("Name", astroinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("Index", astroinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("NFields", astroinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("NKeys", astroinstru) + "</td>";
-					table_row += "<td>" +  getElemListVal("Keys", " ", astroinstru) + "</td>";
+					table_row += "<td>" +  astroinstru.Name.value + "</td>";
+					table_row += "<td>" +  astroinstru.Index.value + "</td>";
+					table_row += "<td>" +  astroinstru.NFields.value + "</td>";
+					table_row += "<td>" +  astroinstru.NKeys.value + "</td>";
+					table_row += "<td>" +  getElemListValHelper(astroinstru.Keys.value, " ") + "</td>";
 					if (showplot) {
-						table_row += generateImageCol(getElemVal("DistPlot", astroinstru));
+						table_row += generateImageColHelper(astroinstru.DistPlot.value);
 					} else {
 						table_row += "<td></td>";
 					}
@@ -573,12 +554,12 @@
 				$.each(scamp_data.PhotInstruments, function(i, photoinstru) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  getElemVal("Name", photoinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("Index", photoinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("Index", photoinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("MagZeroPoint_Output", photoinstru) + "</td>";
-					table_row += "<td>" +  getElemVal("NKeys", photoinstru) + "</td>";
-					table_row += "<td>" +  getElemListVal("Keys", " ", photoinstru) + "</td>";
+					table_row += "<td>" +  photoinstru.Name.value + "</td>";
+					table_row += "<td>" +  photoinstru.Index.value + "</td>";
+					table_row += "<td>" +  photoinstru.Index.value + "</td>";
+					table_row += "<td>" +  photoinstru.MagZeroPoint_Output.value + "</td>";
+					table_row += "<td>" +  photoinstru.NKeys.value + "</td>";
+					table_row += "<td>" +  getElemListValHelper(photoinstru.Keys.value, " ") + "</td>";
 					table_row += "</tr>";
 					$(table_row).appendTo("#photometricInstrumentsTable tbody");
 				});
@@ -612,9 +593,9 @@
 				$.each(scamp_data.Warnings, function(i, warn) {
 					var table_row = "";
 					table_row += "<tr>";
-					table_row += "<td>" +  getElemVal("Date", warn) + "</td>";
-					table_row += "<td>" +  getElemVal("Time", warn) + "</td>";
-					table_row += "<td>" +  getElemVal("Text", warn) + "</td>";
+					table_row += "<td>" +  warn.Date.value + "</td>";
+					table_row += "<td>" +  warn.Time.value + "</td>";
+					table_row += "<td>" +  warn.Text.value + "</td>";
 					$(table_row).appendTo("#warningsTable tbody");
 				});
 
