@@ -648,7 +648,7 @@ JsonOut_write()
     json_object *fgroup_array = json_object_new_array();
     for (i=0; i<json_nfgroups; i++) {
         fgroupstruct *fgroup = json_fgroups[i];
-        json_object *fgroup_row = json_object_new_array();
+        json_object *fgroup_row = json_object_new_object();
         json_object *o;
 
         o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
@@ -933,7 +933,7 @@ JsonOut_write()
             }
         }
 
-        json_object *astr_instru_row = json_object_new_array();
+        json_object *astr_instru_row = json_object_new_object();
 
         o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
         snprintf(strbuff, MAXCHAR, "A%d", i+1);
@@ -1002,7 +1002,7 @@ JsonOut_write()
             }
         }
 
-        json_object *phot_instru_row = json_object_new_array();
+        json_object *phot_instru_row = json_object_new_object();
 
         o = new_json_object("Name", "string", NULL, "meta.id;meta.dataset");
         snprintf(strbuff, MAXCHAR, "P%d", i+1);
@@ -1045,7 +1045,7 @@ JsonOut_write()
     json_object *warn_array = json_object_new_array();
     char *warnstr;
     for (warnstr = warning_history(), i=0; *warnstr; warnstr = warning_history(), i++) {
-        json_object *warn_row = json_object_new_array();
+        json_object *warn_row = json_object_new_object();
 
         o = new_json_object("Date", "string", NULL, "meta;time.end");
         strncpy(strbuff, &warnstr[0], 10);
