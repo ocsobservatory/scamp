@@ -498,7 +498,7 @@ JsonOut_write()
         for (j=0; j<field->naxis; j++)
             json_object_array_add(p, json_object_new_double(field->meanwcspos[j]));
         json_object_object_add(o, "value", p);
-        json_object_object_add(field_row, "Field_Coordinate", o);
+        json_object_object_add(field_row, "Field_Coordinates", o);
 
         o = new_json_object("Pixel_Scale", "float array", "%s", "instr.scale;instr.pixel;stat.mean");
         p = json_object_new_array();
