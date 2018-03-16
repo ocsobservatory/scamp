@@ -7,7 +7,7 @@
 *
 *	This file part of:	SCAMP
 *
-*	Copyright:		(C) 2002-2017 IAP/CNRS/UPMC
+*	Copyright:		(C) 2002-2018 IAP/CNRS/UPMC
 *
 *	License:		GNU General Public License
 *
@@ -22,7 +22,7 @@
 *	You should have received a copy of the GNU General Public License
 *	along with SCAMP. If not, see <http://www.gnu.org/licenses/>.
 *
-*	Last modified:		29/10/2017
+*	Last modified:		16/03/2018
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
@@ -1311,5 +1311,44 @@ void	locate_set(setstruct *set)
 
   return;
   }
+
+
+/****** makepoly_set ********************************************************
+PROTO   void makepoly_field(setstruct *set)
+PURPOSE Compute polygon defining the set footprint in celestial coordinates.
+INPUT   Pointer to set.
+OUTPUT  -.
+NOTES   -.
+AUTHOR  E. Bertin (IAP)
+VERSION	16/03/2018
+*/
+void	makepoly_set(setstruct *set)
+  {
+   wcsstruct	*wcs;
+   double	rawpos[2];
+   int		lng, lat;
+
+  if (!(wcs = set->wcs))
+    return;
+  lng = wcs->lng;
+  lat = wcs->lat;
+
+/* 1st corner */
+  rawpos[lng] = 0.5;
+  rawpos[lat] = 0.5;
+  raw_to_wcs(wcs, rawpos, set->footprint[0]);
+/* 2nd corner */
+  rawpos[lng] += wcs->naxisn[lng] + 0.5;
+  raw_to_wcs(wcs, rawpos, set->footprint[1]);
+/* 3rd corner */
+  rawpos[lat] = wcs->naxisn[lat] + 0.5;
+  raw_to_wcs(wcs, rawpos, set->footprint[2]);
+/* 4th corner */
+  rawpos[lng] = 0.5;
+  raw_to_wcs(wcs, rawpos, set->footprint[3]);
+
+  return;
+  }
+
 
 

@@ -7,7 +7,7 @@
 *
 *	This file part of:	SCAMP
 *
-**	Copyright:		(C) 2002-2017 IAP/CNRS/UPMC
+**	Copyright:		(C) 2002-2018 IAP/CNRS/UPMC
 *
 *	License:		GNU General Public License
 *
@@ -22,7 +22,7 @@
 *	You should have received a copy of the GNU General Public License
 *	along with SCAMP. If not, see <http://www.gnu.org/licenses/>.
 *
-*	Last modified:		26/06/2017
+*	Last modified:		16/03/2018
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
@@ -129,6 +129,7 @@ extern double		dhmedian(double *ra, int n);
 
 extern void		end_field(fieldstruct *field),
 			locate_field(fieldstruct *field),
+			makepoly_field(fieldstruct *field),
 			print_fieldinfo(fieldstruct *field),
 			scale_field(fieldstruct *field, fieldstruct *reffield);
 #ifdef USE_THREADS

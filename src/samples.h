@@ -7,7 +7,7 @@
 *
 *	This file part of:	SCAMP
 *
-*	Copyright:		(C) 2002-2017 IAP/CNRS/UPMC
+*	Copyright:		(C) 2002-2018 IAP/CNRS/UPMC
 *
 *	License:		GNU General Public License
 *
@@ -22,7 +22,7 @@
 *	You should have received a copy of the GNU General Public License
 *	along with SCAMP. If not, see <http://www.gnu.org/licenses/>.
 *
-*	Last modified:		26/06/2017
+*	Last modified:		16/03/2018
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
@@ -112,6 +112,7 @@ typedef struct set
   double	distance;		/* Dist. to a set from another field */
   double	projposmin[NAXIS];	/* Minimum projected position in set */
   double	projposmax[NAXIS];	/* Maximum projected position in set */
+  double	footprint[4][NAXIS];	/* Qualidrateral describing footprint */
   int		naxis;			/* Number of axes */
   int		lng,lat;		/* Longitude and latitude indices */
   int		ncontext;		/* Number of contexts */
@@ -151,6 +152,7 @@ void		copy_samples(samplestruct *samplein, setstruct *set,
 		free_samples(setstruct *set),
 		locate_set(setstruct *set),
  		malloc_samples(setstruct *set, int nsample),
+		makepoly_set(setstruct *set),
 		make_weights(setstruct *set, samplestruct *sample),
 		mix_samples(setstruct *set),
 		realloc_samples(setstruct *set, int nsample),

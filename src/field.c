@@ -7,7 +7,7 @@
 *
 *	This file part of:	SCAMP
 *
-*	Copyright:		(C) 2002-2017 IAP/CNRS/UPMC
+*	Copyright:		(C) 2002-2018 IAP/CNRS/UPMC
 *
 *	License:		GNU General Public License
 *
@@ -22,7 +22,7 @@
 *	You should have received a copy of the GNU General Public License
 *	along with SCAMP. If not, see <http://www.gnu.org/licenses/>.
 *
-*	Last modified:		11/11/2017
+*	Last modified:		16/03/2018
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
@@ -528,6 +528,28 @@ void	locate_field(fieldstruct *field)
 /* Free memory */
   for (i=0; i<naxis; i++)
     free(scale[i]);
+
+  return;
+  }
+
+
+/****** makepoly_field ********************************************************
+PROTO   void makepoly_field(fieldstruct *field)
+PURPOSE Compute polygons defining the footprint of sets for a field.
+INPUT   Field pointer.
+OUTPUT  -.
+NOTES   -.
+AUTHOR  E. Bertin (IAP)
+VERSION	16/03/2018
+*/
+void	makepoly_field(fieldstruct *field)
+  {
+   int	s;
+
+  if (field->set)
+    for (s=0; s<field->nset; s++)
+      if (field->set[s])
+        makepoly_set(field->set[s]);
 
   return;
   }
